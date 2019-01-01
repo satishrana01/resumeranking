@@ -198,7 +198,7 @@ def res(jobfile,skillset,jd_exp):
         final_rating = round(similarity*jd_weightage,2)+Resume_skill_vector.__getitem__(index)+Resume_nonTechSkills_vector.__getitem__(index)+Resume_exp_vector.__getitem__(index)
         res = ResultElement(round(similarity*jd_weightage,2), tempList.__getitem__(index),Resume_skill_vector.__getitem__(index),
                            Resume_name_vector.__getitem__(index),Resume_phoneNo_vector.__getitem__(index),Resume_email_vector.__getitem__(index),
-                           Resume_nonTechSkills_vector.__getitem__(index),Resume_exp_vector.__getitem__(index),final_rating)
+                           Resume_nonTechSkills_vector.__getitem__(index),Resume_exp_vector.__getitem__(index),round(final_rating,2))
         flask_return.append(res)
     flask_return.sort(key=lambda x: x.finalRank, reverse=True)
     return flask_return
