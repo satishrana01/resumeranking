@@ -28,7 +28,7 @@ def extract_name(resume):
 def extract_phone_numbers(string):
     r = re.compile(r'(\d{3}[-\.\s]??\d{3}[-\.\s]??\d{4}|\(\d{3}\)\s*\d{3}[-\.\s]??\d{4}|\d{3}[-\.\s]??\d{4})')
     phone_numbers = r.findall(string)
-    return [re.sub(r'\D', '', number) for number in phone_numbers]
+    return [re.sub(r'\D', '', number) for number in phone_numbers if len(number) >9]
 
 #Function to extract Email address from a string using regular expressions
 def extract_email_addresses(string):
