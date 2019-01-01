@@ -28,7 +28,10 @@ def get_exp(JD_exp,CV_text):
     
     if(not first_string.isdigit()):
         string_text = str(first_string)
-        x=w2n.word_to_num(string_text)
+        try:
+            x=w2n.word_to_num(string_text)
+        except Exception:
+            x=0
         return(get_year_wtg(JD_exp,int(x)))
         
     return(get_year_wtg(JD_exp,first_string))    

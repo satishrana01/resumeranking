@@ -7,14 +7,13 @@ Created on Sat Dec 29 20:57:57 2018
 #python -m spacy download en_core_web_sm
 import spacy
 import re
-from spacy import displacy
 #from collections import Counter
 import en_core_web_sm
 
 
 #Function to extract names from the string using spacy
 def extract_name(resume):
-    return "saurabh"
+   
    # Load English tokenizer, tagger, parser, NER and word vectors
     nlp = en_core_web_sm.load()
     nlp = spacy.load('en_core_web_sm')
@@ -22,8 +21,8 @@ def extract_name(resume):
     for ent in doc.ents:
         if(ent.label_ == 'PER'):
             print(ent.text)
-            break
-            
+            break 
+    return ent.text                  
 
 #Function to extract Phone Numbers from string using regular expressions
 def extract_phone_numbers(string):
