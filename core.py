@@ -178,7 +178,7 @@ def res(jobfile,skillset,jd_exp):
             Resume_Vector.append(vector.toarray())
             Resume_skill_vector.append(skills.programmingScore(temptext,jobfile+skillset))
             Resume_email_vector.append(entity.extract_email_addresses(temptext))
-            Resume_name_vector.append(entity.extract_name(temptext))
+            Resume_name_vector.append(exp.get_total_exp(jd_exp,temptext))
             Resume_phoneNo_vector.append(entity.extract_phone_numbers(temptext))
             Resume_exp_vector.append(exp.get_exp(jd_exp,temptext))
             Resume_nonTechSkills_vector.append(skills.NonTechnicalSkillScore(temptext,jobfile+skillset))

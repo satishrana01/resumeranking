@@ -55,6 +55,35 @@ def get_year_wtg(JD_exp,ext_exp):
     return exp_weightage
 
 
+def get_total_exp(JD_exp,CV_text):
+        
+    doc = nlp(CV_text)
+    year_string = ''
+    first_string ='zero'
+    # Print out named entities
+    for ent in doc.ents:
+        years_of_experience = ent.text
+        if("year" in years_of_experience):
+            print(ent.text, ent.label_)
+            year_string = ent.text
+            break
+    token_string = nlp(year_string)
+    
+    #catch the token
+    for token in token_string:
+        first_string = str(token)
+        break
+    #print("This is the splited string: ",first_string)
+    
+    if(not first_string.isdigit()):
+        string_text = str(first_string)
+        try:
+            x=w2n.word_to_num(string_text)
+        except Exception:
+            x=0
+        return (int(x))
+        
+    return first_string 
 
 
 
