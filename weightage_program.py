@@ -45,11 +45,11 @@ def get_year_wtg(JD_exp,ext_exp):
     if((int(JD_exp[0]) == int(ext_exp)) or (int(JD_exp[2]) == int(ext_exp))):
         exp_weightage
     elif((int(JD_exp[0]) - 1 == int(ext_exp)) or (int(JD_exp[2]) +1 == int(ext_exp))):
-        exp_weightage-=exp_weightage-10 
+        exp_weightage-=10 
     elif(int(JD_exp[0]) -2 == int(ext_exp)) or (int(JD_exp[2]) +2 == int(ext_exp)):
-        exp_weightage-=exp_weightage-20
+        exp_weightage-=20
     elif(int(JD_exp[0]) -3 == int(ext_exp)) or (int(JD_exp[2]) +3 == int(ext_exp)):
-       exp_weightage-=exp_weightage-30
+       exp_weightage-=30
     else:
         exp_weightage = 0
     return exp_weightage
