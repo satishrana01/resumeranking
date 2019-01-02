@@ -24,7 +24,7 @@ body {
   background: #ffffff none repeat scroll 0 0;
   border-radius: 2px;
   margin: 50px auto 30px;
-  max-width: 90%;
+  max-width: 100%;
   padding: 50px 70px 70px 71px;
 }
 
@@ -53,31 +53,33 @@ body {
             {% if session.logged_in %}
 		<table class="table-hover">
 			<thead>
-			  <tr style="text-align: center;">
-			  <th>Rating(%)</th>
-			  <th>Experience</th>
+			  <tr style="text-align: left;">
+			  <th>S.No.</th>
 			  <th>PhoneNo</th>
 			  <th>Email</th>
+			  <th>Experience</th>
 			  <th>JD (15%)</th>
 			  <th>skill (40%)</th>
 			  <th>exp (40%)</th>
 			  <th>Non_Tech Skills (5%)</th>
+			  <th>Rating(%)</th>
 			  <th>Resume</th>	  
 				
 			  </tr>
 			</thead>
 			{% for r in results :%}
 				<tbody>
-			  		<tr>
+			  		<tr style="text-align: left;">
 						
-						<td style="width: 70px;">{{r.finalRank}}</td>
-						<td style="width: 70px;">{{r.name}}</td>
+						<td style="width: 70px;">{{ loop.index0 }}</td>
 						<td style="width: 70px;">{{r.phoneNo}}</td>
 						<td style="width: 70px;">{{r.email}}</td>
+						<td style="width: 70px;">{{r.name}}</td>
         				<td style="width: 70px;">{{r.jd}}</td>
         				<td style="width: 70px;">{{r.skillRank}}</td>
         				<td style="width: 70px;">{{r.exp}}</td>
         				<td style="width: 70px;">{{r.nonTechSkills}}</td>
+        				<td style="width: 70px;">{{r.finalRank}}</td>
         				<td><a href="{{url_for('custom_static', filename=r.filename)}}">{{r.filename}}</a></td>
 			  		</tr>
 				</tbody>

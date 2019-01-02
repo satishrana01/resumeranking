@@ -40,16 +40,24 @@ body {
 
 		</div>
 	<div class="form-group">
+	<table class="table-hover">
+	<thead>
+			  <tr style="text-align: left;">
+    			  <th>S.No.</th>
+    			  <th>Resume</th>	  
+			  </tr>
+			</thead>
 			{% for r in name :%}
 				<tbody>
-			  		<tr>
-						
-						<td><a href="{{url_for('custom_static', filename=r)}}">{{r}}</a><br></td>
+				
+			  		<tr style="text-align: left;">
+						<td style="width: 70px;">{{ loop.index0 }}</td>
+						<td style="width: 70px;"><a href="{{url_for('custom_static', filename=r)}}">{{r}}</a><br></td>
 				
 			  		</tr>
 				</tbody>
 			{% endfor %}
-						
+		</table>				
 		</div>
 	</div>
 
