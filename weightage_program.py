@@ -4,10 +4,12 @@
 
 from word2number import w2n
 import spacy
+import string
 nlp = spacy.load('en_core_web_sm')
 
 def get_exp(JD_exp,CV_text):
-    
+    CV_text  = string.replace(CV_text, 'yrs', 'year')
+    CV_text  = string.replace(CV_text, 'yr', 'year')
     doc = nlp(CV_text)
     year_string = ''
     first_string ='zero'
