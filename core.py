@@ -71,14 +71,15 @@ def res(jobfile,skillset,jd_exp):
     print("This is LIST OF FILES")
     print(LIST_OF_FILES)
 
-    # print("Total Files to Parse\t" , len(LIST_OF_PDF_FILES))
+    
     print("####### PARSING ########")
-    for nooo,i in enumerate(LIST_OF_FILES):
+    pythoncom.CoInitialize()
+    for count,i in enumerate(LIST_OF_FILES):
        
         Temp = i.rsplit('.', 1)
         if Temp[1] == "pdf" or Temp[1] == "Pdf" or Temp[1] == "PDF":
             try:
-                print("This is PDF" , nooo)
+                print(count," This is PDF" , i)
                 with open(i,'rb') as pdf_file:
                     
                     read_pdf = PyPDF2.PdfFileReader(pdf_file)
@@ -106,10 +107,10 @@ def res(jobfile,skillset,jd_exp):
                 print(e)
                 print(traceback.format_exc())
         if Temp[1] == "doc" or Temp[1] == "Doc" or Temp[1] == "DOC":
-            print("This is DOC" , i)
+            print(count," This is DOC" , i)
                 
             try:
-                pythoncom.CoInitialize()
+                
                 wordapp = win32com.client.Dispatch("Word.Application")
                 doc = wordapp.Documents.Open(os.getcwd()+"/"+i)
                 docText = doc.Content.Text
@@ -121,7 +122,7 @@ def res(jobfile,skillset,jd_exp):
                 
                 
         if Temp[1] == "docx" or Temp[1] == "Docx" or Temp[1] == "DOCX":
-            print("This is DOCX" , i)
+            print(count," This is DOCX" , i)
             try:
                 a = textract.process(i)
                 a = a.replace(b'\n',  b' ')
@@ -192,9 +193,9 @@ def res(jobfile,skillset,jd_exp):
         samples = i
         similarity = cosine_similarity(samples,Job_Desc)[0][0]
         """Ordered_list_Resume_Score.extend(similarity)"""
-        print(Resume_skill_vector)
-        print(Resume_nonTechSkills_vector)
-        print(Resume_exp_vector)
+        #print(Resume_skill_vector)
+        #print(Resume_nonTechSkills_vector)
+        #print(Resume_exp_vector)
         final_rating = round(similarity*jd_weightage,2)+Resume_skill_vector.__getitem__(index)+Resume_nonTechSkills_vector.__getitem__(index)+Resume_exp_vector.__getitem__(index)
         res = ResultElement(round(similarity*jd_weightage,2), tempList.__getitem__(index),Resume_skill_vector.__getitem__(index),
                            Resume_name_vector.__getitem__(index),Resume_phoneNo_vector.__getitem__(index),Resume_email_vector.__getitem__(index),

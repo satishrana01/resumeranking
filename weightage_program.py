@@ -8,8 +8,8 @@ import string
 nlp = spacy.load('en_core_web_sm')
 
 def get_exp(JD_exp,CV_text):
-    CV_text  = string.replace(CV_text, 'yrs', 'year')
-    CV_text  = string.replace(CV_text, 'yr', 'year')
+    CV_text  = str.replace(CV_text, 'yrs', 'year')
+    CV_text  = str.replace(CV_text, 'yr', 'year')
     doc = nlp(CV_text)
     year_string = ''
     first_string ='zero'
@@ -58,7 +58,8 @@ def get_year_wtg(JD_exp,ext_exp):
 
 
 def get_total_exp(JD_exp,CV_text):
-        
+    CV_text  = str.replace(CV_text, 'yrs', 'year')
+    CV_text  = str.replace(CV_text, 'yr', 'year')    
     doc = nlp(CV_text)
     year_string = ''
     first_string ='zero'

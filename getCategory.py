@@ -39,8 +39,8 @@ def programmingScore(resume, jdTxt, progWords = None):
             ResumeProgrammingSkillsMatchedWithJD.append(jdSkillMatched[i].lower())
             if not("#" in jdSkillMatched[i]):
                 fout.write(jdSkillMatched[i]+", ")
-    print("Resume skills matched with JD are ", ResumeProgrammingSkillsMatchedWithJD)
-    print("programming total is ", programmingTotal)
+    #print("Resume skills matched with JD are ", ResumeProgrammingSkillsMatchedWithJD)
+    #print("programming total is ", programmingTotal)
     
    # My Code 
     resumeCorpus = resume.split()
@@ -52,7 +52,7 @@ def programmingScore(resume, jdTxt, progWords = None):
     for i in list1:
         results[i] = list2.count(i) 
     
-    print("Dictionary is ",results)
+    #print("Dictionary is ",results)
     
    #end of code
    
