@@ -57,6 +57,7 @@ def res(jobfile,skillset,jd_exp):
     print(os.getcwd())
     os.chdir('Upload-Resume')
     jd_weightage = 15
+    not_found = 'Not Found'
     
     
     for file in glob.glob('**/*.pdf', recursive=True):
@@ -178,9 +179,19 @@ def res(jobfile,skillset,jd_exp):
             vector = vectorizer.transform(text)
             Resume_Vector.append(vector.toarray())
             Resume_skill_vector.append(skills.programmingScore(temptext,jobfile+skillset))
-            Resume_email_vector.append(entity.extract_email_addresses(temptext))
             Resume_name_vector.append(exp.get_total_exp(jd_exp,temptext))
-            Resume_phoneNo_vector.append(entity.extract_phone_numbers(temptext))
+            temp_phone = entity.extract_phone_numbers(temptext)
+            if(len(temp_phone) == 0):
+                Resume_phoneNo_vector.append(not_found)
+            else:
+                 Resume_phoneNo_vector.append(temp_phone)
+            temp_email = entity.extract_email_addresses(temptext)
+            if(len(temp_email) == 0):
+                Resume_email_vector.append(not_found)
+            else:
+                 Resume_email_vector.append(temp_email)
+                
+           
             Resume_exp_vector.append(exp.get_exp(jd_exp,temptext))
             Resume_nonTechSkills_vector.append(skills.NonTechnicalSkillScore(temptext,jobfile+skillset))
         except Exception:
@@ -197,7 +208,7 @@ def res(jobfile,skillset,jd_exp):
         #print(Resume_nonTechSkills_vector)
         #print(Resume_exp_vector)
         final_rating = round(similarity*jd_weightage,2)+Resume_skill_vector.__getitem__(index)+Resume_nonTechSkills_vector.__getitem__(index)+Resume_exp_vector.__getitem__(index)
-        res = ResultElement(round(similarity*jd_weightage,2), tempList.__getitem__(index),Resume_skill_vector.__getitem__(index),
+        res = ResultElement(round(similarity*jd_weightage,2), tempList.__getitem__(index),round(Resume_skill_vector.__getitem__(index),2),
                            Resume_name_vector.__getitem__(index),Resume_phoneNo_vector.__getitem__(index),Resume_email_vector.__getitem__(index),
                            Resume_nonTechSkills_vector.__getitem__(index),Resume_exp_vector.__getitem__(index),round(final_rating,2))
         flask_return.append(res)

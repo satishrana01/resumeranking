@@ -27,7 +27,9 @@ body {
   max-width: 100%;
   padding: 50px 70px 70px 71px;
 }
-
+table,th,td {
+  border: 1px solid black;
+}
 
 </style>
 </head>
@@ -53,7 +55,7 @@ body {
             {% if session.logged_in %}
 		<table class="table-hover">
 			<thead>
-			  <tr style="text-align: left;">
+			  <tr style="text-align: center;">
 			  <th>S.No.</th>
 			  <th>PhoneNo</th>
 			  <th>Email</th>
@@ -69,17 +71,17 @@ body {
 			</thead>
 			{% for r in results :%}
 				<tbody>
-			  		<tr style="text-align: left;">
+			  		<tr style="text-align: center;">
 						
-						<td style="width: 70px;">{{ loop.index0 }}</td>
-						<td style="width: 70px;">{{r.phoneNo}}</td>
-						<td style="width: 70px;">{{r.email}}</td>
-						<td style="width: 70px;">{{r.name}}</td>
-        				<td style="width: 70px;">{{r.jd}}</td>
-        				<td style="width: 70px;">{{r.skillRank}}</td>
-        				<td style="width: 70px;">{{r.exp}}</td>
-        				<td style="width: 70px;">{{r.nonTechSkills}}</td>
-        				<td style="width: 70px;">{{r.finalRank}}</td>
+						<td>{{ loop.index0 }}</td>
+						<td>{{r.phoneNo}}</td>
+						<td>{{r.email}}</td>
+						<td>{{r.name}}</td>
+        				<td>{{r.jd}}</td>
+        				<td>{{r.skillRank}}</td>
+        				<td>{{r.exp}}</td>
+        				<td>{{r.nonTechSkills}}</td>
+        				<td>{{r.finalRank}}</td>
         				<td><a href="{{url_for('custom_static', filename=r.filename)}}">{{r.filename}}</a></td>
 			  		</tr>
 				</tbody>

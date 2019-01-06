@@ -4,12 +4,13 @@
 
 from word2number import w2n
 import spacy
-import string
+
 nlp = spacy.load('en_core_web_sm')
 
 def get_exp(JD_exp,CV_text):
     CV_text  = str.replace(CV_text, 'yrs', 'year')
     CV_text  = str.replace(CV_text, 'yr', 'year')
+    CV_text  = str.replace(CV_text, 'years', 'year')
     doc = nlp(CV_text)
     year_string = ''
     first_string ='zero'
@@ -40,6 +41,9 @@ def get_exp(JD_exp,CV_text):
 
 
 def get_year_wtg(JD_exp,ext_exp):
+    
+    if JD_exp.find("-") == -1:
+       JD_exp = JD_exp[:]+"-0"
     print("The extracted exp is: ",ext_exp)
     print("JD Expected experince range is :",JD_exp[:])
     exp_weightage = 40
@@ -59,14 +63,17 @@ def get_year_wtg(JD_exp,ext_exp):
 
 def get_total_exp(JD_exp,CV_text):
     CV_text  = str.replace(CV_text, 'yrs', 'year')
-    CV_text  = str.replace(CV_text, 'yr', 'year')    
+    CV_text  = str.replace(CV_text, 'yr', 'year')
+    CV_text  = str.replace(CV_text, 'years', 'year')    
     doc = nlp(CV_text)
+    
     year_string = ''
     first_string ='zero'
     # Print out named entities
     for ent in doc.ents:
         years_of_experience = ent.text
         if("year" in years_of_experience):
+            print(ent)
             print(ent.text, ent.label_)
             year_string = ent.text
             break
@@ -87,6 +94,4 @@ def get_total_exp(JD_exp,CV_text):
         return (int(x))
         
     return first_string 
-
-
 

@@ -22,7 +22,7 @@ def programmingScore(resume, jdTxt, progWords = None):
         if programming[i].lower() in jdTxt.lower() != -1:
             jdSkillCount += 1
             jdSkillMatched.append(programming[i].lower())
-    print("jdSkillCount", jdSkillCount)
+    #print("jdSkillCount", jdSkillCount)
     #for x in range(len(jdSkillMatched)): 
     print("jd Skills matched are ",jdSkillMatched)
     #END 
@@ -59,7 +59,7 @@ def programmingScore(resume, jdTxt, progWords = None):
     constantValue = (individualSkillWeightage/skill_threshold)
     # Updating Dictionary
     results.update({n: constantValue * results[n] for n in results.keys()})
-    print("updated dict is ", results)
+    #print("updated dict is ", results)
 
     TotalScore = sum(results.values())
     print("Score is ", TotalScore)
@@ -94,7 +94,7 @@ def NonTechnicalSkillScore(resume, jd_txt, progWords = None):
         if NonTechnicalSkill[i].lower() in jd_txt.lower() != -1:
             jdSkillCount += 1
             jdSkillMatched.append(NonTechnicalSkill[i].lower())
-    print("jdSkillCount", jdSkillCount)
+    #print("jdSkillCount", jdSkillCount)
     #for x in range(len(jdSkillMatched)): 
     print("jd Skills matched are ",jdSkillMatched)
     #END 
@@ -110,8 +110,8 @@ def NonTechnicalSkillScore(resume, jd_txt, progWords = None):
             ResumeProgrammingSkillsMatchedWithJD.append(jdSkillMatched[i].lower())
             if not("#" in jdSkillMatched[i]):
                 fout.write(jdSkillMatched[i]+", ")
-    print("Resume skills matched with JD are ", ResumeProgrammingSkillsMatchedWithJD)
-    print("Non Technical skill total is ", programmingTotal)
+    #print("Resume skills matched with JD are ", ResumeProgrammingSkillsMatchedWithJD)
+    #print("Non Technical skill total is ", programmingTotal)
     
    # My Code 
     resumeCorpus = resume.split()
@@ -126,15 +126,15 @@ def NonTechnicalSkillScore(resume, jd_txt, progWords = None):
     results = {}
     for i in list1:
         results[i] = list2.count(i) 
-    print("Relevant non-technical skills and their count in resume as per the JD are below")
-    print("Dictionary from resume is ",results)
+    #print("Relevant non-technical skills and their count in resume as per the JD are below")
+    #print("Dictionary from resume is ",results)
     print(type(results))
    #end of code
    
     constantValue = (individualSkillWeightage/skill_threshold)
     # Updating Dictionary
     results.update({n: constantValue * results[n] for n in results.keys()})
-    print("updated dict is ", results)
+    #print("updated dict is ", results)
 
     TotalScore = sum(results.values())
     print("Score is ", TotalScore)
