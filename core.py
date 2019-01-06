@@ -3,8 +3,7 @@ import glob
 import os
 import warnings
 import textract
-import weightage_program as exp
-import win32com.client
+from win32com.client import Dispatch
 import traceback
 import extractEntities as entity
 from gensim.summarization import summarize
@@ -12,6 +11,9 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import PyPDF2
 import getCategory as skills
+from extract_exp import ExtractExp
+from striprtf.striprtf import rtf_to_text
+from pathlib import Path
 
 
 warnings.filterwarnings(action='ignore', category=UserWarning, module='gensim')
@@ -58,6 +60,7 @@ def res(jobfile,skillset,jd_exp):
     os.chdir('Upload-Resume')
     jd_weightage = 15
     not_found = 'Not Found'
+    extract_exp = ExtractExp()
     
     
     for file in glob.glob('**/*.pdf', recursive=True):
@@ -66,6 +69,10 @@ def res(jobfile,skillset,jd_exp):
         LIST_OF_FILES_DOC.append(file)
     for file in glob.glob('**/*.docx', recursive=True):
         LIST_OF_FILES_DOCX.append(file)
+    for file in glob.glob('**/*.rtf', recursive=True):
+        LIST_OF_FILES_DOCX.append(file)
+    for file in glob.glob('**/*.txt', recursive=True):
+        LIST_OF_FILES_DOCX.append(file)     
 
     LIST_OF_FILES = LIST_OF_FILES_DOC + LIST_OF_FILES_DOCX + LIST_OF_FILES_PDF
     # LIST_OF_FILES.remove("antiword.exe")
@@ -107,12 +114,12 @@ def res(jobfile,skillset,jd_exp):
             except Exception as e: 
                 print(e)
                 print(traceback.format_exc())
-        if Temp[1] == "doc" or Temp[1] == "Doc" or Temp[1] == "DOC":
+        elif Temp[1] == "doc" or Temp[1] == "Doc" or Temp[1] == "DOC":
             print(count," This is DOC" , i)
                 
             try:
                 
-                wordapp = win32com.client.Dispatch("Word.Application")
+                wordapp = Dispatch("Word.Application")
                 doc = wordapp.Documents.Open(os.getcwd()+"/"+i)
                 docText = doc.Content.Text
                 wordapp.Quit()
@@ -120,9 +127,22 @@ def res(jobfile,skillset,jd_exp):
                 Resumes.extend(c)
                 Ordered_list_Resume.append(i)
             except Exception as e: print(e)
+         
+        elif Temp[1] == "rtf" or Temp[1] == "Rtf" or Temp[1] == "RTF":
+            print(count," This is Rtf" , i)
                 
+            try:
                 
-        if Temp[1] == "docx" or Temp[1] == "Docx" or Temp[1] == "DOCX":
+                rtf_path = Path(i)
+                with rtf_path.open() as source:
+                    docText = rtf_to_text(source.read())
+                    
+                c = [docText]
+                Resumes.extend(c)
+                Ordered_list_Resume.append(i)
+            except Exception as e: print(e)
+                
+        elif Temp[1] == "docx" or Temp[1] == "Docx" or Temp[1] == "DOCX":
             print(count," This is DOCX" , i)
             try:
                 a = textract.process(i)
@@ -133,9 +153,21 @@ def res(jobfile,skillset,jd_exp):
                 Resumes.extend(c)
                 Ordered_list_Resume.append(i)
             except Exception as e: print(e)
+            
+        elif Temp[1] == "txt" or Temp[1] == "Txt" or Temp[1] == "TXT":
+            print(count," This is txt" , i)
+            try:
+                f = open(file,'r')
+                lines = f.readlines()
+                a =  "\n".join(lines)
+                c = [str(a)]
+                Resumes.extend(c)
+                Ordered_list_Resume.append(i)
+                f.close()
+            except Exception as e: print(e)    
                     
                 
-        if Temp[1] == "ex" or Temp[1] == "Exe" or Temp[1] == "EXE":
+        elif Temp[1] == "ex" or Temp[1] == "Exe" or Temp[1] == "EXE":
             print("This is EXE" , i)
             pass
 
@@ -179,7 +211,8 @@ def res(jobfile,skillset,jd_exp):
             vector = vectorizer.transform(text)
             Resume_Vector.append(vector.toarray())
             Resume_skill_vector.append(skills.programmingScore(temptext,jobfile+skillset))
-            Resume_name_vector.append(exp.get_total_exp(jd_exp,temptext))
+            experience = extract_exp.get_features(temptext)
+            Resume_name_vector.append(experience)
             temp_phone = entity.extract_phone_numbers(temptext)
             if(len(temp_phone) == 0):
                 Resume_phoneNo_vector.append(not_found)
@@ -192,7 +225,7 @@ def res(jobfile,skillset,jd_exp):
                  Resume_email_vector.append(temp_email)
                 
            
-            Resume_exp_vector.append(exp.get_exp(jd_exp,temptext))
+            Resume_exp_vector.append(extract_exp.get_exp_weightage(jd_exp,experience))
             Resume_nonTechSkills_vector.append(skills.NonTechnicalSkillScore(temptext,jobfile+skillset))
         except Exception:
             print(traceback.format_exc())
@@ -214,23 +247,4 @@ def res(jobfile,skillset,jd_exp):
         flask_return.append(res)
     flask_return.sort(key=lambda x: x.finalRank, reverse=True)
     return flask_return
-    # for n,i in enumerate(Z):
-    #     print("Rankkkkk\t" , n+1, ":\t" , i)
-
-    """for n,i in enumerate(Z):
-        # print("Rank\t" , n+1, ":\t" , i)
-        # flask_return.append(str("Rank\t" , n+1, ":\t" , i))
-        name = getfilepath(i)
-        #name = name.split('.')[0]
-        rank = n+1
-        res = ResultElement(rank, name)
-        flask_return.append(res)
-        # res.printresult()
-        print(f"Rank{res.rank+1} :\t {res.filename}")
-    return flask_return"""
-
-
-if __name__ == '__main__':
-    inputStr = input("")
-    sear(inputStr)
-
+ 
