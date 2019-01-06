@@ -39,7 +39,14 @@ def getfilepath(loc):
     temp = temp.replace('\\', '/')
     return temp
 
-
+def parse_docfile(file):
+    pythoncom.CoInitialize()
+    wordapp = Dispatch("Word.Application")
+    doc = wordapp.Documents.Open(os.getcwd()+"/"+file)
+    docText = doc.Content.Text
+    wordapp.Quit()
+    return docText
+    
 def res(jobfile,skillset,jd_exp):
     Resume_Vector = []
     Resume_skill_vector = []
@@ -82,6 +89,7 @@ def res(jobfile,skillset,jd_exp):
     
     print("####### PARSING ########")
     pythoncom.CoInitialize()
+    
     for count,i in enumerate(LIST_OF_FILES):
        
         Temp = i.rsplit('.', 1)
@@ -117,16 +125,7 @@ def res(jobfile,skillset,jd_exp):
         elif Temp[1] == "doc" or Temp[1] == "Doc" or Temp[1] == "DOC":
             print(count," This is DOC" , i)
                 
-            try:
-                
-                wordapp = Dispatch("Word.Application")
-                doc = wordapp.Documents.Open(os.getcwd()+"/"+i)
-                docText = doc.Content.Text
-                wordapp.Quit()
-                c = [docText]
-                Resumes.extend(c)
-                Ordered_list_Resume.append(i)
-            except Exception as e: print(e)
+            parse_docfile(i)
          
         elif Temp[1] == "rtf" or Temp[1] == "Rtf" or Temp[1] == "RTF":
             print(count," This is Rtf" , i)
@@ -171,11 +170,8 @@ def res(jobfile,skillset,jd_exp):
             print("This is EXE" , i)
             pass
 
-
-
     print("Done Parsing.")
-
-
+    print("Please wait we are preparing ranking.")
 
     Job_Desc = 0
     
@@ -227,6 +223,7 @@ def res(jobfile,skillset,jd_exp):
            
             Resume_exp_vector.append(extract_exp.get_exp_weightage(jd_exp,experience))
             Resume_nonTechSkills_vector.append(skills.NonTechnicalSkillScore(temptext,jobfile+skillset))
+            print("Rank prepared for ",Ordered_list_Resume.__getitem__(index))
         except Exception:
             print(traceback.format_exc())
             tempList.__delitem__(index)

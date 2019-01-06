@@ -24,7 +24,7 @@ def programmingScore(resume, jdTxt, progWords = None):
             jdSkillMatched.append(programming[i].lower())
     #print("jdSkillCount", jdSkillCount)
     #for x in range(len(jdSkillMatched)): 
-    print("jd Skills matched are ",jdSkillMatched)
+    #print("jd Skills matched are ",jdSkillMatched)
     #END 
     
     individualSkillWeightage = 0
@@ -62,7 +62,7 @@ def programmingScore(resume, jdTxt, progWords = None):
     #print("updated dict is ", results)
 
     TotalScore = sum(results.values())
-    print("Score is ", TotalScore)
+    #print("Score is ", TotalScore)
 
     fout.close()
 
@@ -96,7 +96,7 @@ def NonTechnicalSkillScore(resume, jd_txt, progWords = None):
             jdSkillMatched.append(NonTechnicalSkill[i].lower())
     #print("jdSkillCount", jdSkillCount)
     #for x in range(len(jdSkillMatched)): 
-    print("jd Skills matched are ",jdSkillMatched)
+    #print("jd Skills matched are ",jdSkillMatched)
     #END 
     if jdSkillCount!=0:
         individualSkillWeightage = skill_weightage/jdSkillCount
@@ -119,8 +119,8 @@ def NonTechnicalSkillScore(resume, jd_txt, progWords = None):
     resumeCorpus = resumeCorpus + ResumeProgrammingSkillsMatchedWithJD
     resumeCorpus = [x.lower() for x in resumeCorpus if isinstance(x, str)]
     jdSkillMatched = [x.lower() for x in jdSkillMatched if isinstance(x, str)]
-    print(type(resumeCorpus))
-    print("jd skills matched in lower case",jdSkillMatched)
+    #print(type(resumeCorpus))
+    #print("jd skills matched in lower case",jdSkillMatched)
     list1 = jdSkillMatched
     list2 = resumeCorpus
     results = {}
@@ -128,7 +128,7 @@ def NonTechnicalSkillScore(resume, jd_txt, progWords = None):
         results[i] = list2.count(i) 
     #print("Relevant non-technical skills and their count in resume as per the JD are below")
     #print("Dictionary from resume is ",results)
-    print(type(results))
+    #print(type(results))
    #end of code
    
     constantValue = (individualSkillWeightage/skill_threshold)
@@ -137,7 +137,7 @@ def NonTechnicalSkillScore(resume, jd_txt, progWords = None):
     #print("updated dict is ", results)
 
     TotalScore = sum(results.values())
-    print("Score is ", TotalScore)
+    #print("Score is ", TotalScore)
 
     fout.close()
 
