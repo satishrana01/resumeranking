@@ -117,6 +117,8 @@ class ExtractExp:
                 #experience_df = experience_df.sort_values(['Type', 'Years','Location'], ascending=[True, False, True])
                 experience_df = experience_df.sort_values(['Type', 'Years'], ascending=[True, False])
                 experience = float(experience_df['Years'].iloc[0])
+            else:
+                experience = 0.0
                         
         except Exception as e:
             print (e)
@@ -127,14 +129,17 @@ class ExtractExp:
         
         score = 0
         resume_exp = int(round(resume_exp))
-        print(resume_exp)
+        #print(resume_exp)
         if jd_exp.find("-") == -1:
             jd_exp = jd_exp[:]+"-0"
             
         min_jd_exp =  int(jd_exp[0])
         max_jd_exp = int(jd_exp[2])
         
-        if resume_exp > min_jd_exp:
+        if resume_exp == 0:
+            score = 0
+            
+        elif resume_exp > min_jd_exp:
             if resume_exp > max_jd_exp:
                 score = self.max_weightage - (self.min_variance*(resume_exp-max_jd_exp))
             else:
