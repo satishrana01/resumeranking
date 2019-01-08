@@ -131,7 +131,7 @@ class ExtractExp:
         resume_exp = int(round(resume_exp))
         #print(resume_exp)
         if jd_exp.find("-") == -1:
-            jd_exp = jd_exp[:]+"-0"
+            jd_exp = "0-"+jd_exp[:]
             
         min_jd_exp =  int(jd_exp[0])
         max_jd_exp = int(jd_exp[2])

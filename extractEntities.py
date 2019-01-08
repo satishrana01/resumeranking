@@ -5,10 +5,10 @@ Created on Sat Dec 29 20:57:57 2018
 @author: saurabh.keshari
 """
 #python -m spacy download en_core_web_sm
-import spacy
+#mport spacy
 import re
 #from collections import Counter
-import en_core_web_sm
+#import en_core_web_sm
 
 
 #Function to extract names from the string using spacy
