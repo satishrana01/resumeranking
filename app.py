@@ -86,10 +86,11 @@ def res():
         search_st = data_set['High Level Job Description'][0]
         skill_text = data_set['Technology'][0] + data_set['Primary Skill'][0]
         jd_exp = data_set['Yrs Of Exp '][0]
+        title = data_set['Job Title'][0]
         flask_return = core.res(search_st,skill_text,jd_exp)
-        
-        print(flask_return)
-        return render_template('result.html', results = flask_return)
+        df = pd.DataFrame(columns=['Title','Experience','Primary Skill','Technology'])
+        df = df.append({'Title': title,'Experience':jd_exp,'Primary Skill':data_set['Primary Skill'][0],'Technology':data_set['Technology'][0]}, ignore_index=True)
+        return render_template('result.html', results = flask_return,jd = df)
 
 @app.route('/uploadResume', methods=['GET', 'POST'])
 def uploadResume():
@@ -102,6 +103,8 @@ def upload_file():
         shutil.rmtree(mydir)
     except OSError as e:
         print ("Error: %s - %s." % (e.filename, e.strerror))"""
+   
+    print("resume-resume",os.getcwd())
     if request.method=='POST' and 'customerfile' in request.files:
         for f in request.files.getlist('customerfile'):
             f.save(os.path.join(app.config['UPLOAD_FOLDER'], f.filename))
@@ -116,7 +119,12 @@ def uploadjdDesc():
 @app.route("/uploadjd", methods=['POST'])
 def upload_jd_file():
     
+    print("resume-jd",os.getcwd())
     if request.method=='POST' and 'customerfile' in request.files:
+        filelist = [ f for f in os.listdir(app.config['UPLOAD_JD_FOLDER']) if f.endswith(".xlsx") ]
+        for f in filelist:
+             os.remove(os.path.join(app.config['UPLOAD_JD_FOLDER'], f))
+        
         for f in request.files.getlist('customerfile'):
             f.save(os.path.join(app.config['UPLOAD_JD_FOLDER'], f.filename))
             
