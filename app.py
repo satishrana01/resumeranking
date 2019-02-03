@@ -89,7 +89,7 @@ def res():
         title = data_set['Job Title'][0]
         flask_return = core.res(search_st,skill_text,jd_exp)
         df = pd.DataFrame(columns=['Title','Experience','Primary Skill','Technology'])
-        df = df.append({'Title': title,'Experience':jd_exp,'Primary Skill':data_set['Primary Skill'][0],'Technology':data_set['Technology'][0]}, ignore_index=True)
+        df = df.append({'Title': title,'Experience':jd_exp,'Primary Skill':data_set['Primary Skill'][0],'Technology':data_set['Technology'][0],'Job Description':data_set['High Level Job Description'][0]}, ignore_index=True)
         return render_template('result.html', results = flask_return,jd = df)
 
 @app.route('/uploadResume', methods=['GET', 'POST'])

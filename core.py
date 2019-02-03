@@ -22,7 +22,7 @@ warnings.filterwarnings(action='ignore', category=UserWarning, module='gensim')
 
 
 class ResultElement:
-    def __init__(self, jd, filename,skillRank, name, phoneNo, email, nonTechSkills,exp,finalRank):
+    def __init__(self, jd, filename,skillRank, name, phoneNo, email, nonTechSkills,exp,finalRank,skillList,nonTechskillList):
         self.jd = jd
         self.filename = filename
         self.skillRank = skillRank
@@ -32,6 +32,8 @@ class ResultElement:
         self.nonTechSkills = nonTechSkills
         self.exp = exp
         self.finalRank = finalRank
+        self.skillList = skillList
+        self.nonTechskillList = nonTechskillList
 
 
 def getfilepath(loc):
@@ -50,6 +52,8 @@ def parse_docfile(file):
 def res(jobfile,skillset,jd_exp):
     Resume_Vector = []
     Resume_skill_vector = []
+    Resume_skill_list = []
+    Resume_non_skill_list = []
     Resume_email_vector = []
     Resume_phoneNo_vector = []
     Resume_name_vector = []
@@ -207,6 +211,8 @@ def res(jobfile,skillset,jd_exp):
             vector = vectorizer.transform(text)
             Resume_Vector.append(vector.toarray())
             Resume_skill_vector.append(skills.programmingScore(temptext,jobfile+skillset))
+            Resume_skill_list.append(skills.skillSetListMatchedWithJD(temptext,jobfile+skillset))
+            Resume_non_skill_list.append(skills.nonTechSkillSetListMatchedWithJD(temptext,jobfile+skillset))
             experience = extract_exp.get_features(temptext)
             Resume_name_vector.append(experience)
             temp_phone = entity.extract_phone_numbers(temptext)
@@ -240,7 +246,8 @@ def res(jobfile,skillset,jd_exp):
         final_rating = round(similarity*jd_weightage,2)+Resume_skill_vector.__getitem__(index)+Resume_nonTechSkills_vector.__getitem__(index)+Resume_exp_vector.__getitem__(index)
         res = ResultElement(round(similarity*jd_weightage,2), tempList.__getitem__(index),round(Resume_skill_vector.__getitem__(index),2),
                            Resume_name_vector.__getitem__(index),Resume_phoneNo_vector.__getitem__(index),Resume_email_vector.__getitem__(index),
-                           Resume_nonTechSkills_vector.__getitem__(index),Resume_exp_vector.__getitem__(index),round(final_rating,2))
+                           Resume_nonTechSkills_vector.__getitem__(index),Resume_exp_vector.__getitem__(index),round(final_rating,2),Resume_skill_list.__getitem__(index),
+                           Resume_non_skill_list.__getitem__(index))
         flask_return.append(res)
     flask_return.sort(key=lambda x: x.finalRank, reverse=True)
     return flask_return
