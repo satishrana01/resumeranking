@@ -129,7 +129,7 @@ class ExtractExp:
         
         score = 0
         resume_exp = int(round(resume_exp))
-        #print(resume_exp)
+        #print(jd_exp)
         if jd_exp.find("-") == -1:
             jd_exp = "0-"+jd_exp[:]
             

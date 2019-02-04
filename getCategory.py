@@ -84,6 +84,7 @@ def skillSetListMatchedWithJD(resume, jdTxt):
     for i in range(len(jdSkillMatched)):
         if re.search(jdSkillMatched[i].lower(),resume.lower()):
             skillMatched.append(jdSkillMatched[i].lower())
+            
 
     #print(skillMatched)
     skillMatched = list(set(skillMatched))

@@ -227,7 +227,7 @@ def res(jobfile,skillset,jd_exp):
                  Resume_email_vector.append(temp_email)
                 
            
-            Resume_exp_vector.append(extract_exp.get_exp_weightage(jd_exp,experience))
+            Resume_exp_vector.append(extract_exp.get_exp_weightage(str(jd_exp),experience))
             Resume_nonTechSkills_vector.append(skills.NonTechnicalSkillScore(temptext,jobfile+skillset))
             print("Rank prepared for ",Ordered_list_Resume.__getitem__(index))
         except Exception:
