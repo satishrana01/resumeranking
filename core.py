@@ -14,6 +14,7 @@ import getCategory as skills
 from extract_exp import ExtractExp
 from striprtf.striprtf import rtf_to_text
 from pathlib import Path
+import globals
 
 
 warnings.filterwarnings(action='ignore', category=UserWarning, module='gensim')
@@ -66,23 +67,25 @@ def res(jobfile,skillset,jd_exp):
     LIST_OF_FILES_DOCX = []
     Resumes = []
     Temp_pdf = []
-    os.chdir("..")
-    print(os.getcwd())
-    os.chdir('Upload-Resume')
+    #if count == 0:
+    #    os.chdir("..")
+    #    print(os.getcwd())
+    #    os.chdir('Upload-Resume')
     jd_weightage = 15
     not_found = 'Not Found'
     extract_exp = ExtractExp()
     
+    resumePath = globals.rootpath+globals.pathSeprator+'Upload-Resume'
     
-    for file in glob.glob('**/*.pdf', recursive=True):
+    for file in glob.glob(resumePath+'/*.pdf', recursive=False):
         LIST_OF_FILES_PDF.append(file)
-    for file in glob.glob('**/*.doc', recursive=True):
+    for file in glob.glob(resumePath+'/*.doc', recursive=False):
         LIST_OF_FILES_DOC.append(file)
-    for file in glob.glob('**/*.docx', recursive=True):
+    for file in glob.glob(resumePath+'/*.docx', recursive=False):
         LIST_OF_FILES_DOCX.append(file)
-    for file in glob.glob('**/*.rtf', recursive=True):
+    for file in glob.glob(resumePath+'/*.rtf', recursive=False):
         LIST_OF_FILES_DOCX.append(file)
-    for file in glob.glob('**/*.txt', recursive=True):
+    for file in glob.glob(resumePath+'/*.txt', recursive=False):
         LIST_OF_FILES_DOCX.append(file)     
 
     LIST_OF_FILES = LIST_OF_FILES_DOC + LIST_OF_FILES_DOCX + LIST_OF_FILES_PDF

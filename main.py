@@ -1,4 +1,5 @@
 import glob
+import globals
 import os
 import warnings
 from flask import (Flask,session,flash, redirect, render_template, request,
@@ -27,8 +28,9 @@ app.config['UPLOAD_JD_FOLDER'] = 'Upload-JD'
 app.config['ALLOWED_EXTENSIONS'] = set(['txt', 'pdf', 'doc', 'docx'])
 
 class jd:
-    def __init__(self, name):
-        self.name = name
+    def __init__(self, df,resumeObject):
+        self.df = df
+        self.resumeObject = resumeObject
 
 def getfilepath(loc):
     temp = str(loc).split('\\')
@@ -77,6 +79,7 @@ def stream():
 
     return flask.Response( read_process(), mimetype= 'text/plain' )
 """
+"""
 @app.route('/results', methods=['GET', 'POST'])
 def res():
     if request.method == 'POST':
@@ -91,6 +94,29 @@ def res():
         df = pd.DataFrame(columns=['Title','Experience','Primary Skill','Technology'])
         df = df.append({'Title': title,'Experience':jd_exp,'Primary Skill':data_set['Primary Skill'][0],'Technology':data_set['Technology'][0],'Job Description':data_set['High Level Job Description'][0]}, ignore_index=True)
         return render_template('result.html', results = flask_return,jd = df)
+"""
+@app.route('/results', methods=['GET', 'POST'])
+def res():
+    if request.method == 'POST':
+        #os.chdir(app.config['UPLOAD_JD_FOLDER'])
+        jd_file_path = globals.rootpath+globals.pathSeprator+app.config['UPLOAD_JD_FOLDER']+globals.pathSeprator
+        files = glob.glob(jd_file_path+'*.xlsx', recursive=False)
+        result = []
+        print("JD files to be processed ",len(files))
+        for file in files:
+            data_set = pd.read_excel(file)
+            search_st = data_set['High Level Job Description'][0]
+            skill_text = data_set['Technology'][0] + data_set['Primary Skill'][0]
+            jd_exp = data_set['Yrs Of Exp '][0]
+            title = data_set['Job Title'][0]
+            flask_return = core.res(search_st,skill_text,jd_exp)
+            df = pd.DataFrame(columns=['Title','Experience','Primary Skill','Technology'])
+            df = df.append({'Title': title,'Experience':jd_exp,'Primary Skill':data_set['Primary Skill'][0],'Technology':data_set['Technology'][0],'Job Description':data_set['High Level Job Description'][0]}, ignore_index=True)
+            obj = jd(df,flask_return)
+            result.append(obj)
+        print("size",len(result))    
+        return render_template('result.html', results = result)
+
 
 @app.route('/uploadResume', methods=['GET', 'POST'])
 def uploadResume():
@@ -98,18 +124,13 @@ def uploadResume():
 
 @app.route("/upload", methods=['POST'])
 def upload_file():
-    """mydir= os.listdir(app.config['UPLOAD_FOLDER'])
-    try:
-        shutil.rmtree(mydir)
-    except OSError as e:
-        print ("Error: %s - %s." % (e.filename, e.strerror))"""
-   
-    print("resume-resume",os.getcwd())
+       
+    resume_file_path = globals.rootpath+globals.pathSeprator+app.config['UPLOAD_FOLDER']+globals.pathSeprator
     if request.method=='POST' and 'customerfile' in request.files:
         for f in request.files.getlist('customerfile'):
-            f.save(os.path.join(app.config['UPLOAD_FOLDER'], f.filename))
+            f.save(os.path.join(resume_file_path, f.filename))
             
-        x = os.listdir(app.config['UPLOAD_FOLDER'])
+        x = os.listdir(resume_file_path)
         return render_template("resultlist.html", name=x)
     
 @app.route('/uploadjdDesc', methods=['GET', 'POST'])
@@ -119,16 +140,16 @@ def uploadjdDesc():
 @app.route("/uploadjd", methods=['POST'])
 def upload_jd_file():
     
-    print("resume-jd",os.getcwd())
+    jd_file_path = globals.rootpath+globals.pathSeprator+app.config['UPLOAD_JD_FOLDER']+globals.pathSeprator
     if request.method=='POST' and 'customerfile' in request.files:
-        filelist = [ f for f in os.listdir(app.config['UPLOAD_JD_FOLDER']) if f.endswith(".xlsx") ]
-        for f in filelist:
-             os.remove(os.path.join(app.config['UPLOAD_JD_FOLDER'], f))
+        #filelist = [ f for f in os.listdir(app.config['UPLOAD_JD_FOLDER']) if f.endswith(".xlsx") ]
+        #for f in filelist:
+        #     os.remove(os.path.join(app.config['UPLOAD_JD_FOLDER'], f))
         
         for f in request.files.getlist('customerfile'):
-            f.save(os.path.join(app.config['UPLOAD_JD_FOLDER'], f.filename))
+            f.save(os.path.join(jd_file_path, f.filename))
             
-        x = os.listdir(app.config['UPLOAD_JD_FOLDER'])
+        x = os.listdir(jd_file_path)
         return render_template("resultlist.html", name=x)
 		
 """ single file upload		
@@ -179,5 +200,6 @@ def custom_static(filename):
 if __name__ == '__main__':
    # app.run(debug = True) 
     # app.run('127.0.0.1' , 5000 , debug=True)
+    globals.initialize()
     app.run('0.0.0.0' , 5000 , debug=True , threaded=True)
     

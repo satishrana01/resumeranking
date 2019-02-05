@@ -106,7 +106,6 @@ text-align: center;}
 
 </style>
 </head>
-
 <div id="dvData" style="display:none;">
 	<table>
 		<tr>
@@ -123,7 +122,8 @@ text-align: center;}
 			  <td>Rating(%)</td>
 			  <td>Resume</td>
 		</tr>
-		{% for r in results :%}
+		 {% for m in results :%}
+		{% for r in m.resumeObject :%}
 				
 			  		<tr class="active"">
 						
@@ -138,10 +138,11 @@ text-align: center;}
         				<td>{{r.exp}}</td>
         				<td>{{r.nonTechSkills}}</td>
         				<td>{{r.finalRank}}</td>
-        				<td><a href="{{url_for('custom_static', filename=r.filename)}}">{{r.filename}}</a></td>
+        				<td>{{r.filename}}</td>
 			  		</tr>
-				
+				<tr/>
 			{% endfor %}
+		{% endfor %}	
 	</table>
 </div>
 
@@ -158,10 +159,14 @@ text-align: center;}
             </div>
           </div>
         </div>
-        
+          <div class="form-group" style="margin-top: -49px;margin-left: 1111px;">
+    			<a id="export" data-export="export" class="export"><button type="button" class="btn btn-primary">Download</button></a>
+    	</div>
+          {% for m in results :%}
+        <div>
         <div class="form-group">
-    			<h3>Job Description</h3>
-    			{{ jd.to_html(classes="table table-striped") | safe}}
+    			<h3>Job Description {{ loop.index0 }}</h3>
+    			{{ m.df.to_html(classes="table table-striped") | safe}}
     	</div>
     	
         <div class="section">
@@ -169,11 +174,9 @@ text-align: center;}
     			<h3>Resume Ranking</h3>
     			
     	</div>
-    	 <div class="form-group" style="margin-top: -49px;margin-left: 1111px;">
-    			<a id="export" data-export="export" class="export"><button type="button" class="btn btn-primary">Download</button></a>
-    	</div>  
+    	  
 		
-            {% if session.logged_in %}
+          
            
 		<table class="table-hover">
 			<thead>
@@ -193,7 +196,7 @@ text-align: center;}
 				
 			  </tr>
 			</thead>
-			{% for r in results :%}
+			{% for r in m.resumeObject :%}
 				<tbody>
 			  		<tr style="text-align: center;">
 						
@@ -212,15 +215,17 @@ text-align: center;}
 			  		</tr>
 				</tbody>
 			{% endfor %}
-
-		</table>
+			</table>
+			</div></br></br>
+        {% endfor %}
+		
 <br>
           <form action="/" method="GET" style="text-align:center">
         
             <button class="btn btn-primary" type="submit">Back</button>
 
           </form>
-          {% endif %}
+        
 	</div>
 
 

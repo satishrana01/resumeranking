@@ -1,12 +1,13 @@
 import re
 import string
+import globals
 
 def programmingScore(resume, jdTxt):
     skill_weightage = 40
     skill_threshold = 5
     fout = open("results.tex", "a")
     fout.write("\\textbf{Programming Languages:} \\\\\n")
-    programming = loadSkillSetDB("skillDB.txt")
+    programming = loadSkillSetDB(globals.rootpath+globals.pathSeprator+"skillDB.txt")
     programmingTotal = 0
     
     #jdSkillCount = 0
@@ -32,14 +33,14 @@ def programmingScore(resume, jdTxt):
             ResumeProgrammingSkillsMatchedWithJD.append(jdSkillMatched[i].lower())
             if not("#" in jdSkillMatched[i]):
                 fout.write(jdSkillMatched[i]+", ")
-    #print("Resume skills matched with JD are ", ResumeProgrammingSkillsMatchedWithJD)
+    print("Resume skills matched with JD are ", ResumeProgrammingSkillsMatchedWithJD)
     #print("programming total is ", programmingTotal)
     
    # My Code 
     resumeCorpus = resume.split()
     resumeCorpus = [x.lower() for x in resumeCorpus if isinstance(x, str)]
     jdSkillMatched = [x.lower() for x in jdSkillMatched if isinstance(x, str)]
-    list1 = jdSkillMatched
+    list1 = ResumeProgrammingSkillsMatchedWithJD
     list2 = []
     for item in resumeCorpus:
         list2.append(remove_punctuations(item))
@@ -72,7 +73,8 @@ def programmingScore(resume, jdTxt):
 
 def skillSetListMatchedWithJD(resume, jdTxt):
    
-    programming = loadSkillSetDB("skillDB.txt")
+    programming = []
+    programming = loadSkillSetDB(globals.rootpath+globals.pathSeprator+'skillDB.txt')
     jdSkillCount = 0
     jdSkillMatched = []
     skillMatched = []
@@ -82,7 +84,7 @@ def skillSetListMatchedWithJD(resume, jdTxt):
             jdSkillMatched.append(programming[i].lower())
     
     for i in range(len(jdSkillMatched)):
-        if re.search(jdSkillMatched[i].lower(),resume.lower()):
+        if jdSkillMatched[i].lower() in resume.lower() != -1:
             skillMatched.append(jdSkillMatched[i].lower())
             
 
@@ -92,7 +94,8 @@ def skillSetListMatchedWithJD(resume, jdTxt):
 
 def nonTechSkillSetListMatchedWithJD(resume, jdTxt):
    
-    programming = loadSkillSetDB("nonSkillDB.txt")
+    programming = []
+    programming = loadSkillSetDB(globals.rootpath+globals.pathSeprator+"nonSkillDB.txt")
     jdSkillCount = 0
     jdSkillMatched = []
     skillMatched = []
@@ -102,7 +105,7 @@ def nonTechSkillSetListMatchedWithJD(resume, jdTxt):
             jdSkillMatched.append(programming[i].lower())
     
     for i in range(len(jdSkillMatched)):
-        if re.search(jdSkillMatched[i].lower(),resume.lower()):
+        if jdSkillMatched[i].lower() in resume.lower() != -1:
             skillMatched.append(jdSkillMatched[i].lower())
 
     #print(skillMatched)
@@ -129,7 +132,7 @@ def NonTechnicalSkillScore(resume, jd_txt):
     skill_threshold = 5
     fout = open("results.tex", "a")
     fout.write("\\textbf{Programming Languages:} \\\\\n")
-    NonTechnicalSkill = loadSkillSetDB("nonSkillDB.txt")
+    NonTechnicalSkill = loadSkillSetDB(globals.rootpath+globals.pathSeprator+"nonSkillDB.txt")
     programmingTotal = 0
     
     # ADDED BY SAURABH for extracting JD skills is *WORKING* 
