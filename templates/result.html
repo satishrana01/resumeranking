@@ -165,7 +165,7 @@ text-align: center;}
           {% for m in results :%}
         <div>
         <div class="form-group">
-    			<h3>Job Description {{ loop.index0 }}</h3>
+    			<h3>Job Description {{ loop.index0+1 }}</h3>
     			{{ m.df.to_html(classes="table table-striped") | safe}}
     	</div>
     	
@@ -200,7 +200,7 @@ text-align: center;}
 				<tbody>
 			  		<tr style="text-align: center;">
 						
-						<td>{{ loop.index0 }}</td>
+						<td>{{ loop.index0+1 }}</td>
 						<td>{{r.phoneNo}}</td>
 						<td>{{r.email}}</td>
 						<td>{{r.name}}</td>
