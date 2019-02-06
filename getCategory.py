@@ -40,7 +40,9 @@ def programmingScore(resume, jdTxt):
     resumeCorpus = resume.split()
     resumeCorpus = [x.lower() for x in resumeCorpus if isinstance(x, str)]
     jdSkillMatched = [x.lower() for x in jdSkillMatched if isinstance(x, str)]
-    list1 = ResumeProgrammingSkillsMatchedWithJD
+    list1 = []
+    for item in ResumeProgrammingSkillsMatchedWithJD:
+        list1.append(remove_punctuations(item))
     list2 = []
     for item in resumeCorpus:
         list2.append(remove_punctuations(item))
