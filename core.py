@@ -1,9 +1,9 @@
-import pythoncom
+#import pythoncom
 import glob
 import os
 import warnings
 import textract
-from win32com.client import Dispatch
+#from win32com.client import Dispatch
 import traceback
 import extractEntities as entity
 from gensim.summarization import summarize
@@ -41,7 +41,7 @@ def getfilepath(loc):
     temp = str(loc)
     temp = temp.replace('\\', '/')
     return temp
-
+"""
 def parse_docfile(file):
     pythoncom.CoInitialize()
     wordapp = Dispatch("Word.Application")
@@ -49,7 +49,7 @@ def parse_docfile(file):
     docText = doc.Content.Text
     wordapp.Quit()
     return docText
-    
+"""    
 def res(jobfile,skillset,jd_exp):
     Resume_Vector = []
     Resume_skill_vector = []
@@ -132,7 +132,7 @@ def res(jobfile,skillset,jd_exp):
         elif Temp[1] == "doc" or Temp[1] == "Doc" or Temp[1] == "DOC":
             print(count," This is DOC" , i)
                 
-            parse_docfile(i)
+            #parse_docfile(i)
          
         elif Temp[1] == "rtf" or Temp[1] == "Rtf" or Temp[1] == "RTF":
             print(count," This is Rtf" , i)
