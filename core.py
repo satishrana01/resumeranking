@@ -77,15 +77,15 @@ def res(jobfile,skillset,jd_exp):
     
     resumePath = globals.rootpath+globals.pathSeprator+'Upload-Resume'
     
-    for file in glob.glob(resumePath+'/*.pdf', recursive=False):
+    for file in glob.glob(resumePath+'/*.pdf'):
         LIST_OF_FILES_PDF.append(file)
-    for file in glob.glob(resumePath+'/*.doc', recursive=False):
+    for file in glob.glob(resumePath+'/*.doc'):
         LIST_OF_FILES_DOC.append(file)
-    for file in glob.glob(resumePath+'/*.docx', recursive=False):
+    for file in glob.glob(resumePath+'/*.docx'):
         LIST_OF_FILES_DOCX.append(file)
-    for file in glob.glob(resumePath+'/*.rtf', recursive=False):
+    for file in glob.glob(resumePath+'/*.rtf'):
         LIST_OF_FILES_DOCX.append(file)
-    for file in glob.glob(resumePath+'/*.txt', recursive=False):
+    for file in glob.glob(resumePath+'/*.txt'):
         LIST_OF_FILES_DOCX.append(file)     
 
     LIST_OF_FILES = LIST_OF_FILES_DOC + LIST_OF_FILES_DOCX + LIST_OF_FILES_PDF
