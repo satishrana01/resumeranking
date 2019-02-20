@@ -14,10 +14,10 @@ class ExtractExp:
     
     def get_features(self, text): 
         #TODO: Download below package only once
-        #nltk.download('punkt')
-        #nltk.download('averaged_perceptron_tagger')
-        #nltk.download('maxent_ne_chunker')
-        #nltk.download('words')
+        nltk.download('punkt')
+        nltk.download('averaged_perceptron_tagger')
+        nltk.download('maxent_ne_chunker')
+        nltk.download('words')
        
         self.preprocess_data(text)
         self.tokenize(text)
