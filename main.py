@@ -61,7 +61,7 @@ def res():
     if request.method == 'POST':
         #os.chdir(app.config['UPLOAD_JD_FOLDER'])
         jd_file_path = globals.rootpath+globals.pathSeprator+app.config['UPLOAD_JD_FOLDER']+globals.pathSeprator
-        files = glob.glob(jd_file_path+'*.xlsx', recursive=False)
+        files = glob.glob(jd_file_path+'*.xlsx')
         result = []
         print("JD files to be processed ",len(files))
         for file in files:
