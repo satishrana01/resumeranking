@@ -95,7 +95,7 @@ def res(jobfile,skillset,jd_exp):
 
     
     print("####### PARSING ########")
-    pythoncom.CoInitialize()
+    #pythoncom.CoInitialize()
     
     for count,i in enumerate(LIST_OF_FILES):
        
