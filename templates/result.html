@@ -15,6 +15,7 @@
 <script>
 $(document).ready(function() {
 
+  $(".dataframe table table-striped thead th:first-child").remove()
   function exportTableToCSV($table, filename) {
 
     var $rows = $table.find('tr:has(td)'),
@@ -127,7 +128,7 @@ text-align: center;}
 				
 			  		<tr class="active"">
 						
-						<td>{{ loop.index0 }}</td>
+						<td>{{ loop.index0+1 }}</td>
 						<td>{{r.phoneNo}}</td>
 						<td>{{r.email}}</td>
 						<td>{{r.name}}</td>
@@ -166,12 +167,12 @@ text-align: center;}
         <div>
         <div class="form-group">
     			<h3>Job Description {{ loop.index0+1 }}</h3>
-    			{{ m.df.to_html(classes="table table-striped") | safe}}
+    			{{ m.df.to_html(classes="table table-striped",index=False) | safe}}
     	</div>
     	
         <div class="section">
         <div class="form-group">
-    			<h3>Resume Ranking</h3>
+    			<h3>Resume Rank</h3>
     			
     	</div>
     	  

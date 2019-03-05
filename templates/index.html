@@ -92,7 +92,7 @@ function resetResult(){
     {% if not session.logged_in %}
      <a  class="btn btn-primary" href="{{ url_for('login') }}">log in</a>
      {% else %}
-	   <a class="btn btn-primary" style="float: left;" href="{{ url_for('uploadResume') }}">Upload-CVs</a>
+	   <a class="btn btn-primary" style="float: left;" href="{{ url_for('uploadResume') }}">Upload-Resume</a>
 	   <a class="btn btn-primary" href="{{ url_for('uploadjdDesc') }}">Upload-JD</a>
        <a class="btn btn-primary" style="float: right" href="{{ url_for('logout') }}">Logout</a>
        

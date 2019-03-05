@@ -44,14 +44,14 @@ body {
 	<thead>
 			  <tr style="text-align: left;">
     			  <th>S.No.</th>
-    			  <th>Resume</th>	  
+    			  <th>File Name</th>	  
 			  </tr>
 			</thead>
 			{% for r in name :%}
 				<tbody>
 				
 			  		<tr style="text-align: left;">
-						<td style="width: 70px;">{{ loop.index0 }}</td>
+						<td style="width: 70px;">{{ loop.index0+1 }}</td>
 						<td style="width: 70px;"><a href="{{url_for('custom_static', filename=r)}}">{{r}}</a><br></td>
 				
 			  		</tr>

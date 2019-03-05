@@ -5,8 +5,8 @@ import globals
 def programmingScore(resume, jdTxt):
     skill_weightage = 40
     skill_threshold = 5
-    fout = open("results.tex", "a")
-    fout.write("\\textbf{Programming Languages:} \\\\\n")
+    #fout = open("results.tex", "a")
+    #fout.write("\\textbf{Programming Languages:} \\\\\n")
     programming = loadSkillSetDB(globals.rootpath+globals.pathSeprator+"skillDB.txt")
     programmingTotal = 0
     
@@ -31,9 +31,9 @@ def programmingScore(resume, jdTxt):
         if jdSkillMatched[i].lower() in resume.lower() != -1:
             programmingTotal += 1
             ResumeProgrammingSkillsMatchedWithJD.append(jdSkillMatched[i].lower())
-            if not("#" in jdSkillMatched[i]):
-                fout.write(jdSkillMatched[i]+", ")
-    print("Resume skills matched with JD are ", ResumeProgrammingSkillsMatchedWithJD)
+            #if not("#" in jdSkillMatched[i]):
+                #fout.write(jdSkillMatched[i]+", ")
+    #print("Resume skills matched with JD are ", ResumeProgrammingSkillsMatchedWithJD)
     #print("programming total is ", programmingTotal)
     
    # My Code 
@@ -66,7 +66,7 @@ def programmingScore(resume, jdTxt):
     TotalScore = sum(results.values())
     #print("Score is ", TotalScore)
 
-    fout.close()
+    #fout.close()
 
     #progScore = min(programmingTotal/10.0, 1) * 5.0
 
@@ -132,8 +132,8 @@ def remove_punctuations(text):
 def NonTechnicalSkillScore(resume, jd_txt):
     skill_weightage = 5
     skill_threshold = 5
-    fout = open("results.tex", "a")
-    fout.write("\\textbf{Programming Languages:} \\\\\n")
+    #fout = open("results.tex", "a")
+    #fout.write("\\textbf{Programming Languages:} \\\\\n")
     NonTechnicalSkill = loadSkillSetDB(globals.rootpath+globals.pathSeprator+"nonSkillDB.txt")
     programmingTotal = 0
     
@@ -158,8 +158,8 @@ def NonTechnicalSkillScore(resume, jd_txt):
         if jdSkillMatched[i].lower() in resume.lower() != -1:
             programmingTotal += 1
             ResumeProgrammingSkillsMatchedWithJD.append(jdSkillMatched[i].lower())
-            if not("#" in jdSkillMatched[i]):
-                fout.write(jdSkillMatched[i]+", ")
+            #if not("#" in jdSkillMatched[i]):
+                #fout.write(jdSkillMatched[i]+", ")
     #print("Resume skills matched with JD are ", ResumeProgrammingSkillsMatchedWithJD)
     #print("Non Technical skill total is ", programmingTotal)
     
@@ -189,7 +189,7 @@ def NonTechnicalSkillScore(resume, jd_txt):
     # Updating Dictionary
     results.update({n: constantValue * results[n] for n in results.keys()})
     TotalScore = sum(results.values())
-    fout.close()
+    #fout.close()
 
     #progScore = min(programmingTotal/10.0, 1) * 5.0
 
