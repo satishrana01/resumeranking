@@ -9,6 +9,7 @@ import globals
 import glob
 import core
 import pandas as pd
+import time
 
 class ConsoleRunner:
     
@@ -33,7 +34,51 @@ class ConsoleRunner:
             df = df.append({'Title': title,'Experience':jd_exp,'Primary Skill':data_set['Primary Skill'][0],'Technology':data_set['Technology'][0],'Job Description':data_set['High Level Job Description'][0]}, ignore_index=True)
             obj = ConsoleRunner(df,flask_return)
             result.append(obj)
-            print(result)
+                   
+        self.exportOutput(result) 
+        
+    def exportOutput(self,result):
+        output_path = globals.rootpath+globals.pathSeprator+"Output"+globals.pathSeprator+'output_'+str(time.strftime("%Y%m%d-%H%M%S"))+'.xlsx'
+        writer = pd.ExcelWriter(output_path, engine='xlsxwriter')
+        for m in result:
+            
+            list_index = []
+            list_ph = []
+            list_email = []
+            list_exp = []
+            list_skill = []
+            list_jd = []
+            list_skill_w = []
+            list_exp_w = []
+            list_non_tech = []
+            list_rating = []
+            list_file = []
+            count = 1
+            
+            for r in m.resumeObject:
+                list_index.append(count)
+                list_ph.append(r.phoneNo)
+                list_email.append(r.email)
+                list_exp.append(r.name)
+                list_skill.append(r.skillList)
+                list_jd.append(r.jd)
+                list_skill_w.append(r.skillRank)
+                list_exp_w.append(r.exp)
+                list_non_tech.append(r.nonTechSkills)
+                list_rating.append(r.finalRank)
+                list_file.append(r.filename)
+                count+=1
+            df_result = pd.DataFrame({'S.No.':list_index,'PhoneNo':list_ph,'Email':list_email,
+                                      'Experience':list_exp,'Skills':list_skill,'JD (15%)':list_jd,
+                                      'skill (40%)':list_skill_w,'exp (40%)':list_exp_w,'Non_Tech Skills (5%)':list_non_tech,
+                                      'Rating(%)':list_rating,'Resume':list_file})
+            #frames = [m.df,df_result]
+            #result = pd.concat(frames)
+            #m.df.to_excel(writer, sheet_name=str(m.df['Title'][0])[0:31:1])
+            df_result.to_excel(writer, sheet_name=str(m.df['Title'][0])[0:31:1],index=False)
+        
+        writer.save()
+        print('Output genrated at',output_path)
 
 
 if __name__ == '__main__':
