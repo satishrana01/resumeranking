@@ -10,11 +10,13 @@ import glob
 import core
 import pandas as pd
 import time
+import os
 
 class ConsoleRunner:
     
-    def __init__(self, df,resumeObject):
+    def __init__(self, df,jdName,resumeObject):
         self.df = df
+        self.jdName = jdName
         self.resumeObject = resumeObject
     
       
@@ -32,7 +34,7 @@ class ConsoleRunner:
             flask_return = core.res(search_st,skill_text,jd_exp)
             df = pd.DataFrame(columns=['Title','Experience','Primary Skill','Technology'])
             df = df.append({'Title': title,'Experience':jd_exp,'Primary Skill':data_set['Primary Skill'][0],'Technology':data_set['Technology'][0],'Job Description':data_set['High Level Job Description'][0]}, ignore_index=True)
-            obj = ConsoleRunner(df,flask_return)
+            obj = ConsoleRunner(df,os.path.basename(file),flask_return)
             result.append(obj)
                    
         self.exportOutput(result) 
@@ -71,7 +73,7 @@ class ConsoleRunner:
             df_result = pd.DataFrame({'S.No.':list_index,'PhoneNo':list_ph,'Email':list_email,
                                       'Experience':list_exp,'Skills':list_skill,'JD (15%)':list_jd,
                                       'skill (40%)':list_skill_w,'exp (40%)':list_exp_w,'Non_Tech Skills (5%)':list_non_tech,
-                                      'Rating(%)':list_rating,'Resume':list_file})
+                                      'Rating(%)':list_rating,'Resume':list_file,'JD-Name':m.jdName})
             #frames = [m.df,df_result]
             #result = pd.concat(frames)
             #m.df.to_excel(writer, sheet_name=str(m.df['Title'][0])[0:31:1])
@@ -82,7 +84,7 @@ class ConsoleRunner:
 
 
 if __name__ == '__main__':
-    runner = ConsoleRunner("Console Runner","")
+    runner = ConsoleRunner("Console Runner","","")
     globals.initialize()
     runner.main()
     

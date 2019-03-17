@@ -1,4 +1,3 @@
-import re
 import string
 import globals
 
@@ -48,8 +47,11 @@ def programmingScore(resume, jdTxt):
         list2.append(remove_punctuations(item))
     results = {}
     for i in list1:
-        results[i] = list2.count(i) 
-    
+        if list2.count(i) > skill_threshold:
+            results[i] = skill_threshold
+        else:
+            results[i] = list2.count(i)
+        
     #print("Dictionary is ",results)
     #print(list1)
     #print("list2",list2)
@@ -80,10 +82,13 @@ def skillSetListMatchedWithJD(resume, jdTxt):
     jdSkillCount = 0
     jdSkillMatched = []
     skillMatched = []
+    results = {}
     for i in range(len(programming)):
         if programming[i].lower() in jdTxt.lower() != -1:
             jdSkillCount += 1
             jdSkillMatched.append(programming[i].lower())
+    
+    jdSkillMatched = list(set(jdSkillMatched))
     
     for i in range(len(jdSkillMatched)):
         if jdSkillMatched[i].lower() in resume.lower() != -1:
@@ -92,7 +97,19 @@ def skillSetListMatchedWithJD(resume, jdTxt):
 
     #print(skillMatched)
     skillMatched = list(set(skillMatched))
-    return skillMatched
+    resumeCorpus = resume.split()
+    resumeCorpus = [x.lower() for x in resumeCorpus if isinstance(x, str)]
+    list1 = []
+    for item in skillMatched:
+        list1.append(remove_punctuations(item))
+    list2 = []
+    for item in resumeCorpus:
+        list2.append(remove_punctuations(item))
+    results = {}
+    for i in list1:
+        results[i] = list2.count(i)
+    
+    return results
 
 def nonTechSkillSetListMatchedWithJD(resume, jdTxt):
    
