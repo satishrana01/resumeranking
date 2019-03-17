@@ -19,11 +19,9 @@ import globals
 
 warnings.filterwarnings(action='ignore', category=UserWarning, module='gensim')
 
-
-
-
 class ResultElement:
-    def __init__(self, jd, filename,skillRank, name, phoneNo, email, nonTechSkills,exp,finalRank,skillList,nonTechskillList):
+    def __init__(self, jd, filename,skillRank, name, phoneNo, email, nonTechSkills,exp,
+                 finalRank,skillList,nonTechskillList,min_qual,is_min_qual):
         self.jd = jd
         self.filename = filename
         self.skillRank = skillRank
@@ -35,7 +33,8 @@ class ResultElement:
         self.finalRank = finalRank
         self.skillList = skillList
         self.nonTechskillList = nonTechskillList
-
+        self.min_qual =  min_qual
+        self.is_min_qual = is_min_qual
 
 def getfilepath(loc):
     temp = str(loc)
@@ -50,9 +49,11 @@ def parse_docfile(file):
     wordapp.Quit()
     return docText
 """    
-def res(jobfile,skillset,jd_exp):
+def res(jobfile,skillset,jd_exp,min_qual):
     Resume_Vector = []
     Resume_skill_vector = []
+    min_qual_vector = []
+    is_min_qual = []
     Resume_skill_list = []
     Resume_non_skill_list = []
     Resume_email_vector = []
@@ -213,6 +214,18 @@ def res(jobfile,skillset,jd_exp):
             text = [tttt]
             vector = vectorizer.transform(text)
             Resume_Vector.append(vector.toarray())
+            min_qual_score = skills.minQualificationScore(temptext,min_qual)
+            min_qual_vector.append(min_qual_score)
+            confidence = {}
+            score = int((min_qual_score/globals.min_qual_weightage)*100)
+            confidence['confidence'] = score
+            if score >= 60:
+                confidence['min qual'] = 'Yes'
+            elif score < 60 & score >= 0:
+                confidence['min qual'] = 'May Be'
+            else:
+                confidence['min qual'] = 'No'
+            is_min_qual.append(confidence)
             Resume_skill_vector.append(skills.programmingScore(temptext,jobfile+skillset))
             Resume_skill_list.append(skills.skillSetListMatchedWithJD(temptext,jobfile+skillset))
             Resume_non_skill_list.append(skills.nonTechSkillSetListMatchedWithJD(temptext,jobfile+skillset))
@@ -250,7 +263,7 @@ def res(jobfile,skillset,jd_exp):
         res = ResultElement(round(similarity*jd_weightage,2), os.path.basename(tempList.__getitem__(index)),round(Resume_skill_vector.__getitem__(index),2),
                            Resume_name_vector.__getitem__(index),Resume_phoneNo_vector.__getitem__(index),Resume_email_vector.__getitem__(index),
                            Resume_nonTechSkills_vector.__getitem__(index),Resume_exp_vector.__getitem__(index),round(final_rating,2),Resume_skill_list.__getitem__(index),
-                           Resume_non_skill_list.__getitem__(index))
+                           Resume_non_skill_list.__getitem__(index),min_qual_vector.__getitem__(index),is_min_qual.__getitem__(index))
         flask_return.append(res)
     flask_return.sort(key=lambda x: x.finalRank, reverse=True)
     return flask_return

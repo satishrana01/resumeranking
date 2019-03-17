@@ -31,7 +31,8 @@ class ConsoleRunner:
             skill_text = data_set['Technology'][0] + data_set['Primary Skill'][0]
             jd_exp = data_set['Yrs Of Exp '][0]
             title = data_set['Job Title'][0]
-            flask_return = core.res(search_st,skill_text,jd_exp)
+            min_qual = data_set['Minimum Qualification'][0]
+            flask_return = core.res(search_st,skill_text,jd_exp,min_qual)
             df = pd.DataFrame(columns=['Title','Experience','Primary Skill','Technology'])
             df = df.append({'Title': title,'Experience':jd_exp,'Primary Skill':data_set['Primary Skill'][0],'Technology':data_set['Technology'][0],'Job Description':data_set['High Level Job Description'][0]}, ignore_index=True)
             obj = ConsoleRunner(df,os.path.basename(file),flask_return)
@@ -55,6 +56,7 @@ class ConsoleRunner:
             list_non_tech = []
             list_rating = []
             list_file = []
+            list_min_qual = []
             count = 1
             
             for r in m.resumeObject:
@@ -69,10 +71,12 @@ class ConsoleRunner:
                 list_non_tech.append(r.nonTechSkills)
                 list_rating.append(r.finalRank)
                 list_file.append(r.filename)
+                list_min_qual.append(r.is_min_qual)
+                
                 count+=1
             df_result = pd.DataFrame({'S.No.':list_index,'PhoneNo':list_ph,'Email':list_email,
                                       'Experience':list_exp,'Skills':list_skill,'JD (15%)':list_jd,
-                                      'skill (40%)':list_skill_w,'exp (40%)':list_exp_w,'Non_Tech Skills (5%)':list_non_tech,
+                                      'skill (35%)':list_skill_w,'exp (30%)':list_exp_w,'Min Qual (15%)':list_min_qual,'Non_Tech Skills (5%)':list_non_tech,
                                       'Rating(%)':list_rating,'Resume':list_file,'JD-Name':m.jdName})
             #frames = [m.df,df_result]
             #result = pd.concat(frames)
