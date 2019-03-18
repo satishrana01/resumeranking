@@ -221,7 +221,7 @@ def res(jobfile,skillset,jd_exp,min_qual):
             confidence['confidence'] = score
             if score >= 60:
                 confidence['min qual'] = 'Yes'
-            elif score < 60 & score >= 0:
+            elif score < 60 and score > 0:
                 confidence['min qual'] = 'May Be'
             else:
                 confidence['min qual'] = 'No'
