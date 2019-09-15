@@ -3,14 +3,6 @@
 	position: absolute;
 }
 
-/* 
- * Styles for demo only 
- */
-body {
-	background-color: #fff;
-	margin: 50px;
-}
-
 .container {
 	background-color: #fff;
 	padding: 60px 80px;
@@ -36,3 +28,43 @@ h1 {
 	color: #fff;
 }
 .table thead tr{text-align:center !important;}
+
+.customerButton{
+    background-color:#ffa000 !important;
+    font-weight: bold;
+    color: white !important;
+}
+.btn-floating.btn-lg {
+    width: 61.1px;
+    height: 61.1px;
+}
+.amber.darken-2 {
+    background-color: #ffa000!important;
+}
+
+.btn-floating {
+    box-shadow: 0 5px 11px 0 rgba(0,0,0,.18), 0 4px 15px 0 rgba(0,0,0,.15);
+    position: relative;
+    z-index: 1;
+    vertical-align: middle;
+    overflow: hidden;
+    transition: all .2s ease-in-out;
+    margin: 10px;
+    border-radius: 50%;
+    padding: 0;
+    cursor: pointer;
+}
+.btn-floating i {
+    display: inline-block;
+    width: inherit;
+    text-align: center;
+    color: #fff;
+}
+.btn-floating.btn-lg i {
+    font-size: 1.625rem;
+    line-height: 61.1px;
+}
+
+.float-left {
+    float: left!important;
+}

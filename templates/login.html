@@ -9,7 +9,7 @@
 <style>
 body {
     background-image: url("./static/geometry.png");
-	background-position: top;
+	background-size: cover;
 }
 .main-div {
   background: #ffffff none repeat scroll 0 0;
@@ -18,11 +18,30 @@ body {
   max-width: 38%;
   padding: 50px 70px 70px 71px;
 }
+.customerButton{
+    background-color:#ffa000!important;
+    font-weight: bold;
+    color: white;
+}
+.navbar{
+    background-color:#ffa000 !important;
+}
 </style>
 </head>
 <body translate="no">
 	
-	<img height="50px" src="{{ url_for('static', filename='logo.png') }}"/>
+		<!--Navbar -->
+<nav class="mb-1 navbar navbar-expand-lg navbar-dark default-color nav-style">
+  <a class="navbar-brand" href="/">
+    <img src="{{ url_for('static', filename='logo.png') }}" height="30" class="d-inline-block align-top"
+      alt="mdb logo"> Custom Text
+  </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent-333"
+    aria-controls="navbarSupportedContent-333" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+</nav>
+<!--Navbar -->
 	<div class="container">
 	<div class="main-div">
 
@@ -44,8 +63,8 @@ body {
 	  </div>
 	  <div class="form-group">
 	  
-      <input class="btn btn-primary"  type=submit value=Login>
-	  <input class="btn btn-primary"  type=reset value=Reset>
+      <input class="btn customerButton"  type=submit value=Login>
+	  <input class="btn customerButton"  type=reset value=Reset>
   </form>
 
 </div>

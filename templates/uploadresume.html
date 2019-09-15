@@ -11,7 +11,6 @@
 <script src="{{ url_for('static', filename='js/custome1.js') }}"></script>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/all.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-
 <script>
       $(document).on("click", ".browse", function() {
   var file = $(this)
@@ -31,54 +30,113 @@ $(document).on("change", ".file", function() {
         .replace(/C:\\fakepath\\/i, "")
     );
 });
-      //# sourceURL=pen.js
+   
+$(document).on('ready', function(){
+  $('#customerfile').on('change', function(){
+      $('#resumeForm').submit();
+  });
+});
+
+function moveBack(){
+window.location.href="/";
+}
     </script>
 
 <style>
 body {
     background-image: url("./static/geometry.png");
-	background-position: top;
+	background-size: cover;
 }
 .container {
-    max-width: 550px !important;
+    max-width: 750px !important;
+    margin-top: 50px;
+    margin-bottom: 50px;
 	}
+.navbar{
+    background-color:#ffa000 !important;
+}
+.nav-text{
+    font-size: larger;
+}	
+table th{
+font-weight: bold !important;
+}
+	
 </style>
 </head>
 
 <body translate="no">
-
-	
-	<img height="50px" src="{{ url_for('static', filename='logo.png') }}"/>
+<!--Navbar -->
+<nav class="mb-1 navbar navbar-expand-lg navbar-dark default-color nav-style">
+  <a class="navbar-brand" href="#">
+    <img src="{{ url_for('static', filename='logo.png') }}" height="30" class="d-inline-block align-top"
+      alt="mdb logo"> Custom Text
+  </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent-333"
+    aria-controls="navbarSupportedContent-333" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div style="margin-left: 80px;" class="collapse navbar-collapse" id="navbarSupportedContent-333">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <a class="nav-link nav-text" href="/">Home
+         
+        </a>
+      </li>
+      <li class="nav-item active">
+        <a class="nav-link nav-text"  href="{{ url_for('uploadResume') }}">UploadResume</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link nav-text" href="{{ url_for('uploadjdDesc') }}">UploadJD</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link nav-text" href="#">Result</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link nav-text" href="{{ url_for('login') }}">Logout</a>
+      </li>
+    </ul>
+  </div>
+</nav>
+<!--Navbar -->
 	
 	<div class="container">
-	<form role="form" method='POST' action="/upload" enctype="multipart/form-data">
+	<form id="resumeForm" role="form" method='POST' action="/upload" enctype="multipart/form-data">
 		<div class="form-group">
-		<h4>Resume scruitny system</h4>
-			<input required type="file" multiple accept=".docx,.pdf,.rtf,.txt" class="file" name="customerfile">
+		<h4 style="text-align: -webkit-center;font-weight:bold;">Resume scruitny system</h4>
+			<input required type="file" multiple accept=".docx,.pdf,.rtf,.txt" class="file" name="customerfile" id="customerfile">
 			<div class="input-group mb-3">
-				<div class="input-group-prepend">
-					<span class="input-group-text" id="basic-addon1"><i
-						class="fas fa-paperclip"></i></span>
-				</div>
-				<input required type="text" class="form-control" disabled=""
-					placeholder="Upload Resume" aria-label="Upload File"
+				<a class="btn-floating btn-lg amber darken-2 mt-0 float-left waves-effect waves-light browse">
+						<i class="fas fa-cloud-upload-alt"></i>
+					</a>
+				<input style="margin-top:12px;" required type="text" class="form-control" disabled=""
+					placeholder="Upload one or more Resume" aria-label="Upload File"
 					aria-describedby="basic-addon1" >
-				<div class="input-group-append">
-					<button class="browse input-group-text btn btn-primary"
-						id="basic-addon2" type="button">
-						<i class="fas fa-search"></i> Browse
-					</button>
-				</div>
-							
 			</div>
 		</div>
-		<div class="form-group" style="float:right;">
-				<button type="submit" class="btn btn-primary">Upload Resume</button>
-				<button type="reset" class="btn btn-primary">Reset</button>
-
-		</div>
 	</form>
+	<div style="margin-left:80px;" class="form-group">
+	<table class="table-hover">
+	<thead>
+			  <tr style="text-align: left;">
+    			  <th>S.No.</th>
+    			  <th style="text-align: center;">File Name</th>	  
+			  </tr>
+			</thead>
+			{% for r in name :%}
+				<tbody>
+				
+			  		<tr style="text-align: left;">
+						<td style="width: 70px;">{{ loop.index0+1 }}</td>
+						<td style="width: 370px;"><a href="{{url_for('custom_static', filename=r)}}">{{r}}</a><br></td>
+				
+			  		</tr>
+				</tbody>
+			{% endfor %}
+		</table>				
+		</div>
+		
 	</div>
-
+   
 </body>
 </html>

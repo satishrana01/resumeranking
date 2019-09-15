@@ -33,6 +33,7 @@ class jd:
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    session.pop('logged_in', None)
     error = None
     if request.method == 'POST':
         if request.form['username'] != app.config['USERNAME']:
@@ -54,7 +55,7 @@ def logout():
 
 @app.route('/')
 def home():
-     
+    checkSession() 
     return render_template('index.html')
 @app.route('/results', methods=['GET', 'POST'])
 def res():
@@ -82,22 +83,28 @@ def res():
 
 @app.route('/uploadResume', methods=['GET', 'POST'])
 def uploadResume():
-    return render_template('uploadresume.html')
+    checkSession()
+    resume_file_path = globals.rootpath+globals.pathSeprator+app.config['UPLOAD_FOLDER']+globals.pathSeprator
+    x = os.listdir(resume_file_path)
+    return render_template('uploadresume.html',name=x)
 
 @app.route("/upload", methods=['POST'])
 def upload_file():
-       
+    checkSession()   
     resume_file_path = globals.rootpath+globals.pathSeprator+app.config['UPLOAD_FOLDER']+globals.pathSeprator
     if request.method=='POST' and 'customerfile' in request.files:
         for f in request.files.getlist('customerfile'):
             f.save(os.path.join(resume_file_path, f.filename))
             
         x = os.listdir(resume_file_path)
-        return render_template("resultlist.html", name=x)
+        return render_template("uploadresume.html", name=x)
     
 @app.route('/uploadjdDesc', methods=['GET', 'POST'])
 def uploadjdDesc():
-    return render_template('uploadjd.html')
+    checkSession()
+    jd_file_path = globals.rootpath+globals.pathSeprator+app.config['UPLOAD_JD_FOLDER']+globals.pathSeprator
+    x = os.listdir(jd_file_path)
+    return render_template('uploadjd.html',name=x)
 
 @app.route("/uploadjd", methods=['POST'])
 def upload_jd_file():
@@ -109,14 +116,19 @@ def upload_jd_file():
             f.save(os.path.join(jd_file_path, f.filename))
             
         x = os.listdir(jd_file_path)
-        return render_template("resultlist.html", name=x)
+        return render_template("uploadjd.html", name=x)
 
 @app.route('/Upload-Resume/<path:filename>')
 def custom_static(filename):
     return send_from_directory('./Upload-Resume', filename)
 
+@app.route('/Upload-JD/<path:filename>')
+def custom_static_jd(filename):
+    return send_from_directory('./Upload-JD', filename)
 
-
+def checkSession():
+    print("session",session.get('logged_in'))
+       
 if __name__ == '__main__':
    # app.run(debug = True) 
     # app.run('127.0.0.1' , 5000 , debug=True)
