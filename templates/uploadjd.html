@@ -11,7 +11,9 @@
 <script src="{{ url_for('static', filename='js/custome1.js') }}"></script>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/all.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/font-awesome.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/menu.css') }}">
+<script src="{{ url_for('static', filename='js/function.js') }}"></script>
 <script>
       $(document).on("click", ".browse", function() {
   var file = $(this)
@@ -40,61 +42,44 @@ $(document).on("change", ".file", function() {
     </script>
 
 <style>
-body {
-    background-image: url("./static/geometry.png");
-	background-size: cover;
-}
 .container {
     max-width: 750px !important;
     margin-top: 50px;
     margin-bottom: 50px;
     
 	}
-.navbar{
-    background-color:#ffa000 !important;
-}
-.nav-text{
-    font-size: larger;
-}	
+
 </style>
 </head>
 
 <body translate="no">
 
-	
-	<!--Navbar -->
 <nav class="mb-1 navbar navbar-expand-lg navbar-dark default-color nav-style">
   <a class="navbar-brand" href="/">
-    <img src="{{ url_for('static', filename='logo.png') }}" height="30" class="d-inline-block align-top"
-      alt="mdb logo"> Custom Text
+    <img src="{{ url_for('static', filename='logo.png') }}" class="d-inline-block align-top"
+      alt="mdb logo"> King County Farms
   </a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent-333"
-    aria-controls="navbarSupportedContent-333" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <div style="margin-left: 80px;" class="collapse navbar-collapse" id="navbarSupportedContent-333">
-    <ul class="navbar-nav mr-auto">
-      <li class="nav-item">
-        <a class="nav-link nav-text" href="/">Home
-         
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link nav-text"  href="{{ url_for('uploadResume') }}">UploadResume</a>
-      </li>
-      <li class="nav-item  active">
-        <a class="nav-link nav-text" href="{{ url_for('uploadjdDesc') }}">UploadJD</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link nav-text" href="#">Result</a>
-      </li>
-       <li class="nav-item">
-        <a class="nav-link nav-text" href="{{ url_for('login') }}">Logout</a>
-      </li>
-    </ul>
-  </div>
 </nav>
-<!--Navbar -->
+<div id="wrap">
+	<header>
+		<div class="inner relative">
+			<nav id="navigation">
+				<ul id="main-menu">
+					<li class="parent"><a href="/">Home</a></li>
+					<li class="parent">
+						<a href="{{ url_for('uploadResume') }}">UploadResume</a>
+					</li>
+					<li class="current-menu-item"><a href="{{ url_for('uploadjdDesc') }}">UploadJD</a></li>
+					<li class="parent">
+						<a  href="#">Result</a>
+					</li>
+					<li><a href="{{ url_for('login') }}">Logout</a></li>
+				</ul>
+			</nav>
+			<div class="clear"></div>
+		</div>
+	</header>	
+</div>
 	
 	<div class="container">
 	<form id="jdform" role="form" method='POST' action="/uploadjd" enctype="multipart/form-data">
@@ -117,7 +102,7 @@ body {
 	<thead>
 			  <tr style="text-align: left;">
     			  <th>S.No.</th>
-    			  <th style="text-align: center;">File Name</th>	  
+    			  <th>File Name</th>	  
 			  </tr>
 			</thead>
 			{% for r in name :%}

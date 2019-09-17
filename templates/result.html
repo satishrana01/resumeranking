@@ -12,6 +12,10 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}" >
 <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/font-awesome.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/menu.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+<script src="{{ url_for('static', filename='js/function.js') }}"></script>
 <script>
 $(document).ready(function() {
 
@@ -105,12 +109,6 @@ table,th,td {
 th{
 text-align: center;}
 
-.navbar{
-    background-color:#ffa000 !important;
-}
-.nav-text{
-    font-size: larger;
-}
 
 </style>
 </head>
@@ -157,39 +155,33 @@ text-align: center;}
 </div>
 
 <body data-gr-c-s-loaded="true">
-<!--Navbar -->
 <nav class="mb-1 navbar navbar-expand-lg navbar-dark default-color nav-style">
-  <a class="navbar-brand" href="#">
-    <img src="{{ url_for('static', filename='logo.png') }}" height="30" class="d-inline-block align-top"
-      alt="mdb logo"> Custom Text
+  <a class="navbar-brand" href="/">
+    <img src="{{ url_for('static', filename='logo.png') }}" class="d-inline-block align-top"
+      alt="mdb logo"> King County Farms
   </a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent-333"
-    aria-controls="navbarSupportedContent-333" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <div style="margin-left: 80px;" class="collapse navbar-collapse" id="navbarSupportedContent-333">
-    <ul class="navbar-nav mr-auto">
-      <li class="nav-item">
-        <a class="nav-link nav-text" href="/">Home
-         
-        </a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link nav-text"  href="{{ url_for('uploadResume') }}">UploadResume</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link nav-text" href="{{ url_for('uploadjdDesc') }}">UploadJD</a>
-      </li>
-      <li class="nav-item active">
-        <a class="nav-link nav-text" href="#">Result</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link nav-text" href="{{ url_for('login') }}">Logout</a>
-      </li>
-    </ul>
-  </div>
 </nav>
-<!--Navbar -->
+<div id="wrap">
+	<header>
+		<div class="inner relative">
+			<nav id="navigation">
+				<ul id="main-menu">
+					<li class="parent"><a href="/">Home</a></li>
+					<li class="parent">
+						<a href="{{ url_for('uploadResume') }}">UploadResume</a>
+					</li>
+					<li class="parent"><a href="{{ url_for('uploadjdDesc') }}">UploadJD</a></li>
+					<li class="current-menu-item">
+						<a  href="#">Result</a>
+					</li>
+					<li><a href="{{ url_for('login') }}">Logout</a></li>
+				</ul>
+			</nav>
+			<div class="clear"></div>
+		</div>
+	</header>	
+</div>
+
   <div id="top" class="row site">
     <div class="sm-12 md-8 col">
       <div class="main-div">
@@ -202,7 +194,7 @@ text-align: center;}
           </div>
         </div>
           <div class="form-group" style="margin-top: -49px;margin-left: 1111px;">
-    			<a id="export" data-export="export" class="export"><button type="button" class="btn btn-primary">Download</button></a>
+    			<a id="export" data-export="export" class="export"><button type="button" class="btn customerButton">Download</button></a>
     	</div>
           {% for m in results :%}
         <div>
@@ -267,7 +259,7 @@ text-align: center;}
 <br>
           <form action="/" method="GET" style="text-align:center">
         
-            <button class="btn btn-primary" type="submit">Back</button>
+            <button class="btn customerButton" type="submit">Back</button>
 
           </form>
         

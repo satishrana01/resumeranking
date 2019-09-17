@@ -1,3 +1,7 @@
+body {
+    background-image: url("../geometry.png");
+	background-size: cover;
+}
 .file {
 	visibility: hidden;
 	position: absolute;
