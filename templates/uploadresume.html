@@ -73,12 +73,9 @@ font-weight: bold !important;
 			<nav id="navigation">
 				<ul id="main-menu">
 					<li class="parent"><a href="/">Home</a></li>
+					<li class="parent"><a href="{{ url_for('uploadjdDesc') }}">Classification</a></li>
 					<li class="current-menu-item">
-						<a href="{{ url_for('uploadResume') }}">UploadResume</a>
-					</li>
-					<li><a href="{{ url_for('uploadjdDesc') }}">UploadJD</a></li>
-					<li class="parent">
-						<a  href="#">Result</a>
+						<a href="{{ url_for('uploadResume') }}">Resumes</a>
 					</li>
 					<li><a href="{{ url_for('login') }}">Logout</a></li>
 				</ul>
@@ -91,7 +88,7 @@ font-weight: bold !important;
 	<div class="container">
 	<form id="resumeForm" role="form" method='POST' action="/upload" enctype="multipart/form-data">
 		<div class="form-group">
-		<h4 style="text-align: -webkit-center;font-weight:bold;">Resume scruitny system</h4>
+		<h4 style="color:black;text-align: -webkit-center;font-weight:bold;">Resume scruitny system</h4>
 			<input required type="file" multiple accept=".docx,.pdf,.rtf,.txt" class="file" name="customerfile" id="customerfile">
 			<div class="input-group mb-3">
 				<a class="btn-floating btn-lg amber darken-2 mt-0 float-left waves-effect waves-light browse">

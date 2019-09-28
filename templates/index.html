@@ -13,20 +13,32 @@
 <script src="{{ url_for('static', filename='js/function.js') }}"></script>
 <style>
 body {
-    background-image: url("/static/geometry.png");
-	background-size: cover;
+    background-color: white;
 }
 .customerButton{
     background-color:#ffa000!important;
     font-weight: bold;
     color: white;
 }
-.main-div {
-  background: #ffffff none repeat scroll 0 0;
-  border-radius: 2px;
-  margin: 50px auto 30px;
-  max-width: 48%;
-  padding: 50px 70px 70px 71px;
+* {
+  box-sizing: border-box;
+}
+
+.column {
+  float: left;
+  padding: 5px;
+}
+
+.row::after {
+  content: "";
+  clear: both;
+  display: table;
+  
+}
+@media screen and (max-width: 500px) {
+  .column {
+    width: 100%;
+  }
 }
 
 </style>
@@ -79,12 +91,9 @@ function resetResult(){
 			<nav id="navigation">
 				<ul id="main-menu">
 					<li class="current-menu-item"><a href="/">Home</a></li>
+					<li class="parent"><a href="{{ url_for('uploadjdDesc') }}">Classification</a></li>
 					<li class="parent">
-						<a href="{{ url_for('uploadResume') }}">UploadResume</a>
-					</li>
-					<li class="parent"><a href="{{ url_for('uploadjdDesc') }}">UploadJD</a></li>
-					<li class="parent">
-						<a  href="#">Result</a>
+						<a href="{{ url_for('uploadResume') }}">Resumes</a>
 					</li>
 					<li><a href="{{ url_for('login') }}">Logout</a></li>
 				</ul>
@@ -101,12 +110,6 @@ function resetResult(){
     <div class="sm-12 md-8 col">
       <div>
 
-	  <div class="demo-title">
-          <div class="row flex-center">
-            <div class="text-center">
-              <h4>RESUME SCRUITNY SYSTEM</h4>
-            </div>
-          </div>        </div>
 		  
       
 	<div id="formdiv">
@@ -119,29 +122,31 @@ function resetResult(){
    <br>
    <div class="container">
    <form action = "/results" method = "POST" style="text-align:center"> 
-    <div class="form-group">
+        
+    
+    <div class="form-group" style="margin-top: 20px;">
     {% if not session.logged_in %}
      <a  class="btn customerButton" href="{{ url_for('login') }}">log in</a>
      {% else %}
-	   <a class="btn customerButton" style="float: left;" href="{{ url_for('uploadResume') }}">Upload-Resume</a>
-	   <a class="btn customerButton" href="{{ url_for('uploadjdDesc') }}">Upload-JD</a>
-       <a class="btn customerButton" style="float: right" href="{{ url_for('logout') }}">Logout</a>
-       
+     
+     <div class="row">
+          <div class="column">
+             <a href="{{ url_for('uploadjdDesc') }}"><img title="Upload JD" class="customimg rounded-corners" src="{{ url_for('static', filename='classification.jpg') }}"/></a>
+          </div>
+      <div class="column">
+          <a href="{{ url_for('uploadResume') }}"><img title="Upload Resume"class="customimg" src="{{ url_for('static', filename='Resume.jpg') }}"/></a>
+	 
+      </div>
+      <div class="column">
+      <input type="image" class="customimg" title="Result" src="{{ url_for('static', filename='Results.jpg') }}" />
+      
+      </div>
+    </div>
+    
+   
         
    </div><br><br>
-   <!--
-    <div class="form-group">
-   <p>Enter JD Text</p>
-   </div>
-   
-    <div class="form-group">
-	 <textarea maxlength="2000" minlength="150" required style="width: 400px;height: 150px;" name="des"></textarea>
-	</div>
-	-->
-	<div class="form-group">
-	<input class="btn customerButton"  style="float: right" type=submit value="Calculate Rank">
-	<!--input class="btn btn-primary"  type=reset value=Reset-->
-	</div>
+
 	{% endif %}
 	  </form>
 </div>

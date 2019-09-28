@@ -1,6 +1,5 @@
 body {
-    background-image: url("../geometry.png");
-	background-size: cover;
+    background-color: white;
 }
 .file {
 	visibility: hidden;
