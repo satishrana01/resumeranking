@@ -1,6 +1,7 @@
 import nltk, re
 from word2number import w2n
 import pandas as pd
+import globals
 
 class ExtractExp:
     
@@ -9,7 +10,6 @@ class ExtractExp:
     tokens = []
     lines = []
     sentences = []
-    max_weightage = 40;
     min_variance = 5
     
     def get_features(self, text): 
@@ -129,7 +129,7 @@ class ExtractExp:
         
         score = 0
         resume_exp = int(round(resume_exp))
-        #print(resume_exp)
+        #print(jd_exp)
         if jd_exp.find("-") == -1:
             jd_exp = "0-"+jd_exp[:]
             
@@ -141,12 +141,12 @@ class ExtractExp:
             
         elif resume_exp > min_jd_exp:
             if resume_exp > max_jd_exp:
-                score = self.max_weightage - (self.min_variance*(resume_exp-max_jd_exp))
+                score = globals.exp_weightage - (self.min_variance*(resume_exp-max_jd_exp))
             else:
-                score = self.max_weightage
+                score = globals.exp_weightage
                 
         else:
-            score = self.max_weightage - (self.min_variance*(min_jd_exp-resume_exp))
+            score = globals.exp_weightage - (self.min_variance*(min_jd_exp-resume_exp))
         
         if score < 0:
             score = 0
