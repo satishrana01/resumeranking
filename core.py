@@ -58,6 +58,7 @@ def res(jobfile,skillset,jd_exp,min_qual):
     Resume_non_skill_list = []
     Resume_email_vector = []
     Resume_phoneNo_vector = []
+    Resume_ApplicantName_vector = []
     Resume_name_vector = []
     Resume_nonTechSkills_vector = []
     Resume_exp_vector = []
@@ -68,6 +69,7 @@ def res(jobfile,skillset,jd_exp,min_qual):
     LIST_OF_FILES_DOCX = []
     Resumes = []
     Temp_pdf = []
+    Resume_title = []
     #if count == 0:
     #    os.chdir("..")
     #    print(os.getcwd())
@@ -101,6 +103,7 @@ def res(jobfile,skillset,jd_exp,min_qual):
     for count,i in enumerate(LIST_OF_FILES):
        
         Temp = i.rsplit('.', 1)
+        Resume_title.extend(str(i))
         if Temp[1] == "pdf" or Temp[1] == "Pdf" or Temp[1] == "PDF":
             try:
                 print(count," This is PDF" , i)
@@ -231,6 +234,8 @@ def res(jobfile,skillset,jd_exp,min_qual):
             Resume_non_skill_list.append(skills.nonTechSkillSetListMatchedWithJD(temptext,jobfile+skillset))
             experience = extract_exp.get_features(temptext)
             Resume_name_vector.append(experience)
+            temp_applicantName = entity.extractPersonName(temptext, Resume_title[index])
+            Resume_ApplicantName_vector.append(temp_applicantName)
             temp_phone = entity.extract_phone_numbers(temptext)
             if(len(temp_phone) == 0):
                 Resume_phoneNo_vector.append(not_found)
@@ -261,7 +266,7 @@ def res(jobfile,skillset,jd_exp,min_qual):
         #print(Resume_exp_vector)
         final_rating = round(similarity*jd_weightage,2)+Resume_skill_vector.__getitem__(index)+Resume_nonTechSkills_vector.__getitem__(index)+Resume_exp_vector.__getitem__(index)
         res = ResultElement(round(similarity*jd_weightage,2), os.path.basename(tempList.__getitem__(index)),round(Resume_skill_vector.__getitem__(index),2),
-                           Resume_name_vector.__getitem__(index),Resume_phoneNo_vector.__getitem__(index),Resume_email_vector.__getitem__(index),
+                           Resume_name_vector.__getitem__(index),Resume_ApplicantName_vector.__getitem__(index), Resume_phoneNo_vector.__getitem__(index),Resume_email_vector.__getitem__(index),
                            Resume_nonTechSkills_vector.__getitem__(index),Resume_exp_vector.__getitem__(index),round(final_rating,2),Resume_skill_list.__getitem__(index),
                            Resume_non_skill_list.__getitem__(index),min_qual_vector.__getitem__(index),is_min_qual.__getitem__(index))
         flask_return.append(res)

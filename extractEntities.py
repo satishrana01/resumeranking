@@ -7,6 +7,13 @@ Created on Sat Dec 29 20:57:57 2018
 #python -m spacy download en_core_web_sm
 #mport spacy
 import re
+import nltk
+nltk.download('stopwords')
+nltk.download('wordnet')
+nltk.download('punkt')
+from nltk.corpus import wordnet
+from text_process import remove_stopwords, to_lowercase
+
 #from collections import Counter
 #import en_core_web_sm
 
@@ -34,6 +41,73 @@ def extract_phone_numbers(string):
 def extract_email_addresses(string):
     r = re.compile(r'[\w\.-]+@[\w\.-]+')
     return r.findall(string)
+
+def extractPersonName(tttt, resumeTitle):
+        #a = 'Cv_saurabh+keshari_1234_Resume'
+        #a = "1234"
+        titleSplit = re.split(r'[`\-=~!@#$%^&*()_+\[\]{};\'\\:"|<,./<>?]', resumeTitle)
+        title_isNotDigit = []
+        for word in titleSplit:
+            if not word.isdigit():
+                title_isNotDigit.append(word)
+        strr = " ".join(title_isNotDigit)
+        strr_list = strr.split(" ")
+        #titleSplit = re.findall(r"[\w']+", strr)
+        
+        Names = []
+        for Nouns in strr_list:
+            if not wordnet.synsets(Nouns):
+                #Not an English word
+                Names.append(Nouns)
+        titleSplit_lower = to_lowercase(Names)
+        titleSplit_cleaned = remove_stopwords(titleSplit_lower)
+        personName = "ABC"
+        if len(titleSplit_cleaned) > 0:
+            if len(titleSplit_cleaned) == 1:
+                firstName = titleSplit_cleaned[0]
+                personName = firstName
+            if len(titleSplit_cleaned) == 2: 
+                firstName = titleSplit_cleaned[0]
+                secondName = titleSplit_cleaned[1]
+                personName = firstName +" " + secondName
+            if len(titleSplit_cleaned) >= 3: 
+                firstName = titleSplit_cleaned[0]
+                secondName = titleSplit_cleaned[1]
+                thirdName = titleSplit_cleaned[2]
+                personName = firstName +" " + secondName + " " + thirdName
+        
+        else:
+            print("within else")
+            TITLE = r"(?:[A-Z][a-z]*\.\s*)?"
+            NAME1 = r"[A-Z][a-z]+,?\s+"
+            MIDDLE_I = r"(?:[A-Z][a-z]*\.?\s*)?"
+            NAME2 = r"[A-Z][a-z]+"
+            name = []
+            name = re.findall(TITLE + NAME1 + MIDDLE_I + NAME2, tttt)
+            if len(name) > 0:
+                rep1 = {"Career": "", "career": "", "Objective":"", "objective": "", "Email": "", "email": "", "Experience Summary": "", "ph": "", "Ph": "", "Professional": "", "Curriculum Vitae": "", "Resume": "", "Profile": "", "Professional": "", "Recruiter": "", "Lead": "", "Summary": "", "HR": "", "new":"", "New": ""}  # define desired replacements here
+                rep = dict((re.escape(k), v) for k, v in rep1.items()) 
+                #Python 3 renamed dict.iteritems to dict.items so use rep.items() for latest versions
+                pattern = re.compile("|".join(rep.keys()))
+                personName = pattern.sub(lambda m: rep[re.escape(m.group(0))], name[0])
+            else:  
+                personName = "No name found"
+         
+        stopwords = ['HR', 'hr','pdf', 'xls', 'docx', 'doc', 'rtf', 'txt', "assembly", "bash", " c " "c++", "c#", "coffeescript", "emacs lisp",
+         "go!", "groovy", "haskell", "java", "javascript", "matlab", "max MSP", "objective c", "qlikview", "crm", "CRM", "dynamics",
+         "perl", "php","html", "xml", "css", "processing", "python", "ruby", "sml", "swift", "resume","Resume",
+         "latex" "unity", "unix" "visual basic" "wolfram language", "xquery", "sql", "node.js", "finance", "liferay",
+         "scala", "kdb", "jquery", "mongodb", "CMMI", "ISO", "finance", "Banking", "Finacle", "Oracle Flexcube", "Fiserv", "successfactor", "sf", "success factor", "Success Factor",
+         "TCS BaNcs", "FIS Profile", "Self-directed learning", "Collaboration", "Communication", "Resilience", "Big-picture mindset", "Prioritization ", "Creativity ",
+         "creative", "Insight", "curiosity", "curious", "Openness", "Teamwork", "Time management", "Emotional intelligence", 
+         "quick learner", "problem solver","Customer-service skills", "Planning and organizing", "innovative", "Thinking innovatively and creatively", "Resourceful", "Flexible", "Able to manage own time", "Having self-esteem", 
+         "Innovation skills", "Enterprise skills", "Civic or citizenship knowledge and skills", "Sociability", "Self-management", "Integrity", "Honesty", "Human resources", 
+         "Participates as a team member", "Works with diversity", "Exercises leadership", "leadership", "Exercises leadership", "Monitors and corrects performance", "Understands systems", 'experience', 'exp', 'exp.']
+        querywords = personName.split()
+        
+        resultwords  = [word for word in querywords if word.lower() not in stopwords]
+        result = ' '.join(resultwords)         
+        return result
 
 """
 
