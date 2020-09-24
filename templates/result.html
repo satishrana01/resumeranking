@@ -118,17 +118,18 @@ text-align: center;}
 <div id="dvData" style="display:none;">
 	<table>
 		<tr>
-			 <td>S.No.</td>
+			  <td>S.No.</td>
+			  <td>Name</td>
 			  <td>PhoneNo</td>
 			  <td>Email</td>
 			  <td>Experience</td>
 			  <td>Skills</td>
 			  <td>Non-Tech-Skills</td>
 			  <td>JD(15%)</td>
-			  <td>skill(35%)</td>
+			  <td>Core Skills(35%)</td>
 			  <td>exp(30%)</td>
 			  <td>Min_Qual(15%)</td>
-			  <td>Non_Tech Skills(5%)</td>
+			  <td>Soft Skills(5%)</td>
 			  <td>Rating(%)</td>
 			  <td>Resume</td>
 		</tr>
@@ -138,9 +139,10 @@ text-align: center;}
 			  		<tr class="active"">
 						
 						<td>{{ loop.index0+1 }}</td>
+						<td>{{r.candidateName}}</td>
 						<td>{{r.phoneNo}}</td>
 						<td>{{r.email}}</td>
-						<td>{{r.name}}</td>
+						<td>{{r.totalExp}}</td>
 						<td>{{r.skillList}}</td>
 						<td>{{r.nonTechskillList}}</td>
         				<td>{{r.jd}}</td>
@@ -189,7 +191,7 @@ text-align: center;}
           <div class="row flex-center">
             <div class="text-center">
               
-              <h2 style="color:black;margin-left: 500px;">RESUME SCRUITNY SYSTEM</h2>
+              <h2 style="color:black;text-align:center;">RESUME SCRUITNY SYSTEM</h2>
             </div>
           </div>
         </div>
@@ -216,16 +218,17 @@ text-align: center;}
 			<thead>
 			  <tr style="text-align: center;">
 			  <th>S.No.</th>
+			  <th>Name</th>
 			  <th>PhoneNo</th>
 			  <th>Email</th>
 			  <th>Experience</th>
 			  <th>Skills</th>
 			  <!--th>Non-Tech-Skills</th-->
 			  <th>JD (15%)</th>
-			  <th>Skill (35%)</th>
+			  <th>Core Skills (35%)</th>
 			  <th>Exp (30%)</th>
 			  <th>Min_Qual(15%)</th>
-			  <th>Non_Tech Skills (5%)</th>
+			  <th>Soft Skills (5%)</th>
 			  <th>Rating(%)</th>
 			  <th>Resume</th>	  
 				
@@ -236,6 +239,7 @@ text-align: center;}
 			  		<tr style="text-align: center;">
 						
 						<td>{{ loop.index0+1 }}</td>
+						<td>{{r.candidateName}}</td>
 						<td>{{r.phoneNo}}</td>
 						<td>{{r.email}}</td>
 						<td>{{r.name}}</td>
