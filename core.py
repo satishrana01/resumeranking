@@ -20,12 +20,12 @@ import globals
 warnings.filterwarnings(action='ignore', category=UserWarning, module='gensim')
 
 class ResultElement:
-    def __init__(self, jd, filename,skillRank, name, phoneNo, email, nonTechSkills,exp,
+    def __init__(self, jd, filename,skillRank, totalExp, phoneNo, email, nonTechSkills,exp,
                  finalRank,skillList,nonTechskillList,min_qual,is_min_qual,candidateName):
         self.jd = jd
         self.filename = filename
         self.skillRank = skillRank
-        self.name = name
+        self.totalExp = totalExp
         self.phoneNo = phoneNo
         self.email = email
         self.nonTechSkills = nonTechSkills
