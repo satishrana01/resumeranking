@@ -1,7 +1,7 @@
 
 import re, string, unicodedata
 import nltk
-import contractions
+#import contractions
 import inflect
 from bs4 import BeautifulSoup
 from nltk import word_tokenize, sent_tokenize

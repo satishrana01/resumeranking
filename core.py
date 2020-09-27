@@ -104,7 +104,11 @@ def res(jobfile,skillset,jd_exp,min_qual):
     for count,i in enumerate(LIST_OF_FILES):
        
         Temp = i.rsplit('.', 1)
-        Resume_title.extend(str(i))
+        rr= Temp[0].rsplit('\\', 1)
+        
+        print("rr is {}".format(rr[-1]))
+        Resume_title.append(rr[-1])
+        print("Resume title is {}".format(Resume_title))
         if Temp[1] == "pdf" or Temp[1] == "Pdf" or Temp[1] == "PDF":
             try:
                 print(count," This is PDF" , i)
@@ -235,7 +239,8 @@ def res(jobfile,skillset,jd_exp,min_qual):
             Resume_non_skill_list.append(skills.nonTechSkillSetListMatchedWithJD(temptext,jobfile+skillset))
             experience = extract_exp.get_features(temptext)
             Resume_total_exp_vector.append(experience)
-            temp_applicantName = entity.extractPersonName(temptext, Resume_title[index])
+            print("input is {}".format(str(Resume_title.__getitem__(index))))
+            temp_applicantName = entity.extractPersonName(temptext, str(Resume_title.__getitem__(index)))
             Resume_ApplicantName_vector.append(temp_applicantName)
             temp_phone = entity.extract_phone_numbers(temptext)
             if(len(temp_phone) == 0):
