@@ -63,7 +63,7 @@ class ExtractExp:
             print(e)
     
     def get_exp(self,inputString):
-        expMatchStrings = ['experience', 'exp ', 'exp.', 'exp:','experience:']
+        expMatchStrings = ['Experience', 'Experience:', 'Exp','Exp.', 'Exp:', 'experience', 'exp ', 'exp.', 'exp:','experience:']
         #TODO need to calculate months also
         yearStrings = ['yrs', 'years', 'yr']
         experience = []
