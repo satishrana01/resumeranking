@@ -45,7 +45,6 @@ def extract_email_addresses(string):
 def extractPersonName(tttt, resumeTitle):
         #a = 'Cv_saurabh+keshari_1234_Resume'
         #a = "1234"
-        print("resume title is {} and type is {}".format(resumeTitle, type(resumeTitle)))
         titleSplit = re.split(r'[`\-=~!@#$%^&*()_+\[\]{};\'\\:"|<,./<>?]', resumeTitle)
         title_isNotDigit = []
         for word in titleSplit:
@@ -64,7 +63,6 @@ def extractPersonName(tttt, resumeTitle):
         titleSplit_cleaned = remove_stopwords(titleSplit_lower)
         personName = "ABC"
         if len(titleSplit_cleaned) > 0:
-            print('within if')
             if len(titleSplit_cleaned) == 1:
                 firstName = titleSplit_cleaned[0]
                 personName = firstName
@@ -79,7 +77,6 @@ def extractPersonName(tttt, resumeTitle):
                 personName = firstName +" " + secondName
         
         else:
-            print("within else")
             TITLE = r"(?:[A-Z][a-z]*\.\s*)?"
             NAME1 = r"[A-Z][a-z]+,?\s+"
             MIDDLE_I = r"(?:[A-Z][a-z]*\.?\s*)?"

@@ -65,7 +65,7 @@ class ExtractExp:
     def get_exp(self,inputString):
         expMatchStrings = ['Experience', 'Experience:', 'Exp','Exp.', 'Exp:', 'experience', 'exp ', 'exp.', 'exp:','experience:']
         #TODO need to calculate months also
-        yearStrings = ['yrs', 'years', 'yr']
+        yearStrings = ['yrs', 'years', 'yr','year']
         totMatchString = ['professional', 'total', 'around', 'approx', 'approximately', 'approx.', 'approx:', 'approximately:', 'profesional', 'proffesional', 'work', 'technical', 'overall', 'over all']
         experience = []
         experience_df=pd.DataFrame(columns=('Type', 'Years', 'Months', 'Location'))
@@ -89,12 +89,10 @@ class ExtractExp:
                                         expType = 2
                                     else:
                                         expType = 3
-                                        
                                 expStr = leaf[0].strip('+').strip('\x07')
                                 
                                 for match in (expMatchStrings+yearStrings):
                                     expStr = expStr.replace(match,"")
-                                    
                                     #If expStr contains only digit
                                     try:
                                         years = float(expStr)

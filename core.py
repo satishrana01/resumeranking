@@ -239,7 +239,6 @@ def res(jobfile,skillset,jd_exp,min_qual):
             Resume_non_skill_list.append(skills.nonTechSkillSetListMatchedWithJD(temptext,jobfile+skillset))
             experience = extract_exp.get_features(temptext)
             Resume_total_exp_vector.append(experience)
-            print("input is {}".format(str(Resume_title.__getitem__(index))))
             temp_applicantName = entity.extractPersonName(temptext, str(Resume_title.__getitem__(index)))
             Resume_ApplicantName_vector.append(temp_applicantName)
             temp_phone = entity.extract_phone_numbers(temptext)

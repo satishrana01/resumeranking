@@ -33,7 +33,6 @@ class jd:
 
 @application.route('/login', methods=['GET', 'POST'])
 def login():
-    globals.initialize()
     session['logged_in'] = False
     error = None
     if request.method == 'POST':
@@ -56,7 +55,6 @@ def logout():
 
 @application.route('/')
 def home():
-    globals.initialize()
     checkSession() 
     return render_template('index.html')
 @application.route('/results', methods=['GET', 'POST'])
@@ -139,5 +137,6 @@ if __name__ == '__main__':
     # app.run('127.0.0.1' , 5000 , debug=True)
     globals.initialize()
     application.run()
+    
     #app.run('0.0.0.0' , 5000 , debug=True , threaded=True)
     
