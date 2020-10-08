@@ -1,7 +1,22 @@
 import nltk, re
 from word2number import w2n
 import pandas as pd
-import globals
+import os
+
+global rootpath
+rootpath = os.getcwd()
+global pathSeprator
+pathSeprator = '/'
+global min_qual_weightage
+min_qual_weightage = 15
+global skill_threshold
+skill_threshold = 5
+global non_tech_weightage
+non_tech_weightage = 5
+global exp_weightage
+exp_weightage = 0
+global skill_weightage
+skill_weightage = 35
 
 class ExtractExp:
     
@@ -108,7 +123,7 @@ class ExtractExp:
                                                 years = float(expStr)
                                             except Exception as e:
                                                 years = 0
-                                                print(e)
+                                                #print(e)
                             
                                     if years>0 and years < 30:
                                         experience_df = experience_df.append({'Type': expType, 'Years': years, 'Months': 0, 'Location': pos},ignore_index=True)                                    
@@ -141,12 +156,12 @@ class ExtractExp:
             
         elif resume_exp > min_jd_exp:
             if resume_exp > max_jd_exp:
-                score = globals.exp_weightage - (self.min_variance*(resume_exp-max_jd_exp))
+                score = exp_weightage - (self.min_variance*(resume_exp-max_jd_exp))
             else:
-                score = globals.exp_weightage
+                score = exp_weightage
                 
         else:
-            score = globals.exp_weightage - (self.min_variance*(min_jd_exp-resume_exp))
+            score = exp_weightage - (self.min_variance*(min_jd_exp-resume_exp))
         
         if score < 0:
             score = 0

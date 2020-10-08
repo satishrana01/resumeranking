@@ -1,9 +1,25 @@
 import string
 import globals
+import os
+
+global rootpath
+rootpath = os.getcwd()
+global pathSeprator
+pathSeprator = '/'
+global min_qual_weightage
+min_qual_weightage = 15
+global skill_threshold
+skill_threshold = 5
+global non_tech_weightage
+non_tech_weightage = 5
+global exp_weightage
+exp_weightage = 30
+global skill_weightage
+skill_weightage = 35
 
 def programmingScore(resume, jdTxt):
     
-    programming = loadSkillSetDB(globals.rootpath+globals.pathSeprator+"skillDB.txt")
+    programming = loadSkillSetDB(rootpath+pathSeprator+"skillDB.txt")
     programmingTotal = 0
     
     #jdSkillCount = 0
@@ -20,7 +36,7 @@ def programmingScore(resume, jdTxt):
     individualSkillWeightage = 0
     
     if( len(jdSkillMatched) > 0):
-        individualSkillWeightage = globals.skill_weightage/len(jdSkillMatched)
+        individualSkillWeightage = skill_weightage/len(jdSkillMatched)
     
     ResumeProgrammingSkillsMatchedWithJD = []
     for i in range(len(jdSkillMatched)):
@@ -43,8 +59,8 @@ def programmingScore(resume, jdTxt):
         list2.append(remove_punctuations(item))
     results = {}
     for i in list1:
-        if list2.count(i) > globals.skill_threshold:
-            results[i] = globals.skill_threshold
+        if list2.count(i) > skill_threshold:
+            results[i] = skill_threshold
         else:
             results[i] = list2.count(i)
         
@@ -55,7 +71,7 @@ def programmingScore(resume, jdTxt):
     #print(results)
    #end of code
    
-    constantValue = (individualSkillWeightage/globals.skill_threshold)
+    constantValue = (individualSkillWeightage/skill_threshold)
     #print("constant",constantValue)
     # Updating Dictionary
     results.update({n: constantValue * results[n] for n in results.keys()})
@@ -72,7 +88,7 @@ def programmingScore(resume, jdTxt):
     return TotalScore
 
 def minQualificationScore(resume, jdTxt):
-    programming = loadSkillSetDB(globals.rootpath+globals.pathSeprator+"skillDB.txt")
+    programming = loadSkillSetDB(rootpath+pathSeprator+"skillDB.txt")
     programmingTotal = 0
     
     #jdSkillCount = 0
@@ -85,7 +101,7 @@ def minQualificationScore(resume, jdTxt):
     individualSkillWeightage = 0
     
     if( len(jdSkillMatched) > 0):
-        individualSkillWeightage = globals.min_qual_weightage/len(jdSkillMatched)
+        individualSkillWeightage = min_qual_weightage/len(jdSkillMatched)
     
     ResumeProgrammingSkillsMatchedWithJD = []
     for i in range(len(jdSkillMatched)):
@@ -105,12 +121,12 @@ def minQualificationScore(resume, jdTxt):
         list2.append(remove_punctuations(item))
     results = {}
     for i in list1:
-        if list2.count(i) > globals.skill_threshold:
-            results[i] = globals.skill_threshold
+        if list2.count(i) > skill_threshold:
+            results[i] = skill_threshold
         else:
             results[i] = list2.count(i)
         
-    constantValue = (individualSkillWeightage/globals.skill_threshold)
+    constantValue = (individualSkillWeightage/skill_threshold)
     results.update({n: constantValue * results[n] for n in results.keys()})
     TotalScore = sum(results.values())
     
@@ -119,7 +135,7 @@ def minQualificationScore(resume, jdTxt):
 def skillSetListMatchedWithJD(resume, jdTxt):
    
     programming = []
-    programming = loadSkillSetDB(globals.rootpath+globals.pathSeprator+'skillDB.txt')
+    programming = loadSkillSetDB(rootpath+pathSeprator+'skillDB.txt')
     jdSkillCount = 0
     jdSkillMatched = []
     skillMatched = []
@@ -155,7 +171,7 @@ def skillSetListMatchedWithJD(resume, jdTxt):
 def nonTechSkillSetListMatchedWithJD(resume, jdTxt):
    
     programming = []
-    programming = loadSkillSetDB(globals.rootpath+globals.pathSeprator+"nonSkillDB.txt")
+    programming = loadSkillSetDB(rootpath+pathSeprator+"nonSkillDB.txt")
     jdSkillCount = 0
     jdSkillMatched = []
     skillMatched = []
@@ -189,7 +205,7 @@ def remove_punctuations(text):
 
 def NonTechnicalSkillScore(resume, jd_txt):
     
-    NonTechnicalSkill = loadSkillSetDB(globals.rootpath+globals.pathSeprator+"nonSkillDB.txt")
+    NonTechnicalSkill = loadSkillSetDB(rootpath+pathSeprator+"nonSkillDB.txt")
     programmingTotal = 0
     
     # ADDED BY SAURABH for extracting JD skills is *WORKING* 
@@ -204,7 +220,7 @@ def NonTechnicalSkillScore(resume, jd_txt):
     #print("jd Skills matched are ",jdSkillMatched)
     #END 
     if (jdSkillCount > 0):
-        individualSkillWeightage = globals.non_tech_weightage/jdSkillCount
+        individualSkillWeightage = non_tech_weightage/jdSkillCount
     else :
         individualSkillWeightage = 0
 
@@ -230,8 +246,8 @@ def NonTechnicalSkillScore(resume, jd_txt):
     list2 = resumeCorpus
     results = {}
     for i in list1:
-        if list2.count(i) > globals.skill_threshold:
-           results[i] = globals.skill_threshold
+        if list2.count(i) > skill_threshold:
+           results[i] = skill_threshold
         else:
            results[i] = list2.count(i)
 		
@@ -240,7 +256,7 @@ def NonTechnicalSkillScore(resume, jd_txt):
     #print(type(results))
    #end of code
    
-    constantValue = (individualSkillWeightage/globals.skill_threshold)
+    constantValue = (individualSkillWeightage/skill_threshold)
     # Updating Dictionary
     results.update({n: constantValue * results[n] for n in results.keys()})
     TotalScore = sum(results.values())

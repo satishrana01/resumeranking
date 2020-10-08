@@ -108,7 +108,7 @@ $(document).on("change", ".file", function() {
 			  		<tr style="text-align: left;">
 						<td style="width: 70px;">{{ loop.index0+1 }}</td>
 						<td style="width: 370px;"><a href="{{url_for('custom_static_jd', filename=r)}}">{{r}}</a><br></td>
-				
+        				<td><a title="Delete" href="{{ url_for('deleteJd',file_name=r) }}"> <i class="fas fa-trash-alt"></i></a></td>
 			  		</tr>
 				</tbody>
 			{% endfor %}

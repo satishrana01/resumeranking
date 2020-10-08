@@ -14,10 +14,24 @@ import getCategory as skills
 from extract_exp import ExtractExp
 from striprtf.striprtf import rtf_to_text
 from pathlib import Path
-import globals
 
 
 warnings.filterwarnings(action='ignore', category=UserWarning, module='gensim')
+
+global rootpath
+rootpath = os.getcwd()
+global pathSeprator
+pathSeprator = '/'
+global min_qual_weightage
+min_qual_weightage = 15
+global skill_threshold
+skill_threshold = 5
+global non_tech_weightage
+non_tech_weightage = 5
+global exp_weightage
+exp_weightage = 30
+global skill_weightage
+skill_weightage = 35
 
 class ResultElement:
     def __init__(self, jd, filename,skillRank, totalExp, phoneNo, email, nonTechSkills,exp,
@@ -79,7 +93,7 @@ def res(jobfile,skillset,jd_exp,min_qual):
     not_found = 'Not Found'
     extract_exp = ExtractExp()
     
-    resumePath = globals.rootpath+globals.pathSeprator+'Upload-Resume'
+    resumePath = rootpath+pathSeprator+'Upload-Resume'
     
     for file in glob.glob(resumePath+'/*.pdf'):
         LIST_OF_FILES_PDF.append(file)
@@ -225,7 +239,7 @@ def res(jobfile,skillset,jd_exp,min_qual):
             min_qual_score = skills.minQualificationScore(temptext,min_qual)
             min_qual_vector.append(min_qual_score)
             confidence = {}
-            score = int((min_qual_score/globals.min_qual_weightage)*100)
+            score = int((min_qual_score/min_qual_weightage)*100)
             confidence['confidence'] = score
             if score >= 60:
                 confidence['min qual'] = 'Yes'
