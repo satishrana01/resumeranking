@@ -105,7 +105,8 @@ font-weight: bold !important;
 	<thead>
 			  <tr style="text-align: left;">
     			  <th>S.No.</th>
-    			  <th>File Name</th>	  
+    			  <th>File Name</th>
+    			  <th><a title="Delete All Resumes" href="{{ url_for('deleteAllResume') }}"> <i class="fas fa-trash"></i></a><th>	  
 			  </tr>
 			</thead>
 			{% for r in name :%}

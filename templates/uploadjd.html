@@ -99,7 +99,8 @@ $(document).on("change", ".file", function() {
 	<thead>
 			  <tr style="text-align: left;">
     			  <th>S.No.</th>
-    			  <th>File Name</th>	  
+    			  <th>File Name</th>
+    			  <th><a title="Delete All Jds" href="{{ url_for('deleteAllJd') }}"> <i class="fas fa-trash"></i></a><th>	  	  
 			  </tr>
 			</thead>
 			{% for r in name :%}

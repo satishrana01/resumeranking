@@ -116,11 +116,33 @@ def deleteResume(file_name):
     x = os.listdir(resume_file_path)
     return render_template('uploadresume.html',name=x)
 
+@application.route('/deleteAllResume', methods=['GET'])
+def deleteAllResume():
+    checkSession()
+    file_path_to_delete = rootpath+pathSeprator+application.config['UPLOAD_FOLDER']+pathSeprator
+    files = glob.glob(file_path_to_delete+'*')
+    for f in files:
+        os.remove(f)
+    resume_file_path = rootpath+pathSeprator+application.config['UPLOAD_FOLDER']+pathSeprator
+    x = os.listdir(resume_file_path)
+    return render_template('uploadresume.html',name=x)
+
 @application.route('/deleteJd/<file_name>', methods=['GET'])
 def deleteJd(file_name):
     checkSession()
     file_path_to_delete = rootpath+pathSeprator+application.config['UPLOAD_JD_FOLDER']+pathSeprator+file_name
     os.remove(file_path_to_delete)
+    jd_file_path = rootpath+pathSeprator+application.config['UPLOAD_JD_FOLDER']+pathSeprator
+    x = os.listdir(jd_file_path)
+    return render_template('uploadjd.html',name=x)
+
+@application.route('/deleteAllJd', methods=['GET'])
+def deleteAllJd():
+    checkSession()
+    file_path_to_delete = rootpath+pathSeprator+application.config['UPLOAD_JD_FOLDER']+pathSeprator
+    files = glob.glob(file_path_to_delete+'*')
+    for f in files:
+        os.remove(f)
     jd_file_path = rootpath+pathSeprator+application.config['UPLOAD_JD_FOLDER']+pathSeprator
     x = os.listdir(jd_file_path)
     return render_template('uploadjd.html',name=x)
