@@ -17,6 +17,11 @@ from text_process import remove_stopwords, to_lowercase
 #from collections import Counter
 #import en_core_web_sm
 
+def isJobTitleAvailable(jobTitle, tttt):
+    if (tttt.find(jobTitle) != -1): 
+        print ("True") 
+    else: 
+        print ("False) 
 
 #Function to extract names from the string using spacy
 def extract_name(resume):
