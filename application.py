@@ -91,7 +91,7 @@ def res():
             jd_exp = data_set['Yrs Of Exp '][0]
             title = data_set['Job Title'][0]
             min_qual = data_set['Minimum Qualification'][0]
-            flask_return = core.res(search_st,skill_text,jd_exp,min_qual)
+            flask_return = core.res(search_st,skill_text,jd_exp,min_qual, title)
             df = pd.DataFrame(columns=['Title','Experience','Primary Skill','Technology','Min Qualification'])
             df = df.append({'Title': title,'Experience':jd_exp,'Primary Skill':data_set['Primary Skill'][0],'Technology':data_set['Technology'][0],'Min Qualification':data_set['Minimum Qualification'][0],'Job Description':data_set['High Level Job Description'][0]}, ignore_index=True)
             obj = jd(df,flask_return)

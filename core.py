@@ -16,12 +16,12 @@ from striprtf.striprtf import rtf_to_text
 from pathlib import Path
 import pandas as pd
 
-os.chdir('Upload-JD')
-ffile = glob.glob('*.xlsx', recursive=False)
-job_data_set = pd.read_excel(ffile[0])
-job_title = job_data_set['Job Title'][0]
-print("Job title is {}".format(job_title))
-os.chdir('..')
+#os.chdir('Upload-JD')
+#ffile = glob.glob('*.xlsx', recursive=False)
+#job_data_set = pd.read_excel(ffile[0])
+#job_title = job_data_set['Job Title'][0]
+#print("Job title is {}".format(job_title))
+#os.chdir('..')
 
 warnings.filterwarnings(action='ignore', category=UserWarning, module='gensim')
 
@@ -71,7 +71,7 @@ def parse_docfile(file):
     wordapp.Quit()
     return docText
 """    
-def res(jobfile,skillset,jd_exp,min_qual):
+def res(jobfile,skillset,jd_exp,min_qual, job_title):
     Resume_Vector = []
     Resume_skill_vector = []
     min_qual_vector = []
@@ -264,6 +264,8 @@ def res(jobfile,skillset,jd_exp,min_qual):
             temp_applicantName = entity.extractPersonName(temptext, str(Resume_title.__getitem__(index)))
             Resume_ApplicantName_vector.append(temp_applicantName)
             bool_jobTitleFound = entity.isJobTitleAvailable(job_title, temptext)
+            print("bool value is ", bool_jobTitleFound)
+            print("job_title is ", job_title)
             Resume_JobTitleAvailability_vector.append(bool_jobTitleFound)
             temp_phone = entity.extract_phone_numbers(temptext)
             if(len(temp_phone) == 0):

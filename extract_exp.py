@@ -89,7 +89,7 @@ class ExtractExp:
             for sentence in self.lines:#find the index of the sentence where the degree is find and then analyse that sentence
                 pos = pos+1
                 sen=" ".join([words[0].lower() for words in sentence]) #string of words in sentence
-                #print(sen)
+                print(sen)
                 if any(re.search(x,sen) for x in expMatchStrings) and any(re.search(x,sen) for x in yearStrings) and any(re.search(x,sen) for x in totMatchString):
                     sen_tokenised= nltk.word_tokenize(sen)
                     tagged = nltk.pos_tag(sen_tokenised)
