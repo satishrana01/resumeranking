@@ -187,7 +187,6 @@ def custom_static_jd(filename):
 
 def checkSession():
     isLoggedIn = bool(session.get('logged_in'))
-    print(isLoggedIn)
     if isLoggedIn:
         return redirect(url_for('login'))
        

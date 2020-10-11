@@ -126,8 +126,8 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title):
     
     for count,i in enumerate(LIST_OF_FILES):
        
-        Temp = i.rsplit('.', 1)
-        rr= Temp[0].rsplit('\\', 1)
+        Temp = i.rsplit('.',1)
+        rr= Temp[0].rsplit('/',1)
         
         print("rr is {}".format(rr[-1]))
         Resume_title.append(rr[-1])
