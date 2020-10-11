@@ -263,7 +263,7 @@ def res(jobfile,skillset,jd_exp,min_qual):
             Resume_total_exp_vector.append(experience)
             temp_applicantName = entity.extractPersonName(temptext, str(Resume_title.__getitem__(index)))
             Resume_ApplicantName_vector.append(temp_applicantName)
-            bool_jobTitleFound = entity.isJobTitleAvailable(jobTitle, temptext)
+            bool_jobTitleFound = entity.isJobTitleAvailable(job_title, temptext)
             Resume_JobTitleAvailability_vector.append(bool_jobTitleFound)
             temp_phone = entity.extract_phone_numbers(temptext)
             if(len(temp_phone) == 0):
@@ -284,7 +284,7 @@ def res(jobfile,skillset,jd_exp,min_qual):
             print(traceback.format_exc())
             tempList.__delitem__(index)
             
-   
+   # Resume_JobTitleAvailability_vector.__getitem__(index)
     for index,i in enumerate(Resume_Vector):
 
         samples = i
@@ -296,7 +296,7 @@ def res(jobfile,skillset,jd_exp,min_qual):
         final_rating = round(similarity*jd_weightage,2)+Resume_skill_vector.__getitem__(index)+Resume_nonTechSkills_vector.__getitem__(index)+Resume_exp_vector.__getitem__(index)
         res = ResultElement(round(similarity*jd_weightage,2), os.path.basename(tempList.__getitem__(index)),round(Resume_skill_vector.__getitem__(index),2),
                            Resume_total_exp_vector.__getitem__(index), Resume_phoneNo_vector.__getitem__(index),Resume_email_vector.__getitem__(index),
-                           Resume_JobTitleAvailability_vector.__getitem__(index), Resume_nonTechSkills_vector.__getitem__(index),Resume_exp_vector.__getitem__(index),round(final_rating,2),Resume_skill_list.__getitem__(index),
+                           Resume_nonTechSkills_vector.__getitem__(index),Resume_exp_vector.__getitem__(index),round(final_rating,2),Resume_skill_list.__getitem__(index),
                            Resume_non_skill_list.__getitem__(index),min_qual_vector.__getitem__(index),is_min_qual.__getitem__(index),Resume_ApplicantName_vector.__getitem__(index))
         flask_return.append(res)
     flask_return.sort(key=lambda x: x.finalRank, reverse=True)
