@@ -129,6 +129,7 @@ text-align: center;}
 			  <td>Core Skills(35%)</td>
 			  <td>exp(30%)</td>
 			  <td>Min_Qual(15%)</td>
+			  <th>Is Job Title Present</th>
 			  <td>Soft Skills(5%)</td>
 			  <td>Rating(%)</td>
 			  <td>Resume</td>
@@ -149,6 +150,7 @@ text-align: center;}
         				<td>{{r.skillRank}}</td>
         				<td>{{r.exp}}</td>
         				<td>{{r.is_min_qual}}</td>
+        				<td>{{r.isJobTitlePresent}}</td>
         				<td>{{r.nonTechSkills}}</td>
         				<td>{{r.finalRank}}</td>
         				<td>{{r.filename}}</td>
@@ -228,6 +230,7 @@ text-align: center;}
 			  <th>Core Skills (35%)</th>
 			  <th>Exp (0%)</th>
 			  <th>Min_Qual(15%)</th>
+			  <th>Is Job Title Present</th>
 			  <th>Soft Skills (5%)</th>
 			  <th>Rating(%)</th>
 			  <th>Resume</th>	  
@@ -250,6 +253,7 @@ text-align: center;}
         				<td>{{r.exp}}</td>
         				<!--td>{{r.min_qual}}</td-->
         				<td>{{r.is_min_qual}}</td>
+        				<td>{{r.isJobTitlePresent}}</td>
         				<td>{{r.nonTechSkills}}</td>
         				<td>{{r.finalRank}}</td>
         				<td><a href="{{url_for('custom_static', filename=r.filename)}}">{{r.filename}}</a></td>

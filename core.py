@@ -42,7 +42,7 @@ skill_weightage = 35
 
 class ResultElement:
     def __init__(self, jd, filename,skillRank, totalExp, phoneNo, email, nonTechSkills,exp,
-                 finalRank,skillList,nonTechskillList,min_qual,is_min_qual,candidateName):
+                 finalRank,skillList,nonTechskillList,min_qual,is_min_qual,candidateName,isJobTitlePresent):
         self.jd = jd
         self.filename = filename
         self.skillRank = skillRank
@@ -57,6 +57,7 @@ class ResultElement:
         self.min_qual =  min_qual
         self.is_min_qual = is_min_qual
         self.candidateName = candidateName
+        self.isJobTitlePresent = isJobTitlePresent
 
 def getfilepath(loc):
     temp = str(loc)
@@ -235,8 +236,8 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title):
     for index,i in enumerate(Resumes):
 
         text = i
-        temptext = str(text)
-        tttt = str(text)
+        temptext = str(text).lower()
+        tttt = str(text).lower()
        
         
         try:
@@ -262,10 +263,9 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title):
             experience = extract_exp.get_features(temptext)
             Resume_total_exp_vector.append(experience)
             temp_applicantName = entity.extractPersonName(temptext, str(Resume_title.__getitem__(index)))
+            print("applicant name >>>>>>>>>>>",temp_applicantName)
             Resume_ApplicantName_vector.append(temp_applicantName)
             bool_jobTitleFound = entity.isJobTitleAvailable(job_title, temptext)
-            print("bool value is ", bool_jobTitleFound)
-            print("job_title is ", job_title)
             Resume_JobTitleAvailability_vector.append(bool_jobTitleFound)
             temp_phone = entity.extract_phone_numbers(temptext)
             if(len(temp_phone) == 0):
@@ -295,11 +295,11 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title):
         #print(Resume_skill_vector)
         #print(Resume_nonTechSkills_vector)
         #print(Resume_exp_vector)
-        final_rating = round(similarity*jd_weightage,2)+Resume_skill_vector.__getitem__(index)+Resume_nonTechSkills_vector.__getitem__(index)+Resume_exp_vector.__getitem__(index)
+        final_rating = round(similarity*jd_weightage,2)+Resume_skill_vector.__getitem__(index)+Resume_nonTechSkills_vector.__getitem__(index)+Resume_exp_vector.__getitem__(index)+min_qual_vector.__getitem__(index)
         res = ResultElement(round(similarity*jd_weightage,2), os.path.basename(tempList.__getitem__(index)),round(Resume_skill_vector.__getitem__(index),2),
                            Resume_total_exp_vector.__getitem__(index), Resume_phoneNo_vector.__getitem__(index),Resume_email_vector.__getitem__(index),
                            Resume_nonTechSkills_vector.__getitem__(index),Resume_exp_vector.__getitem__(index),round(final_rating,2),Resume_skill_list.__getitem__(index),
-                           Resume_non_skill_list.__getitem__(index),min_qual_vector.__getitem__(index),is_min_qual.__getitem__(index),Resume_ApplicantName_vector.__getitem__(index))
+                           Resume_non_skill_list.__getitem__(index),min_qual_vector.__getitem__(index),is_min_qual.__getitem__(index),Resume_ApplicantName_vector.__getitem__(index),Resume_JobTitleAvailability_vector.__getitem__(index))
         flask_return.append(res)
     flask_return.sort(key=lambda x: x.finalRank, reverse=True)
     return flask_return

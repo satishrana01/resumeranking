@@ -86,11 +86,11 @@ def res():
         print("JD files to be processed ",len(files))
         for file in files:
             data_set = pd.read_excel(file)
-            search_st = data_set['High Level Job Description'][0]
-            skill_text = data_set['Technology'][0] + data_set['Primary Skill'][0]
+            search_st = data_set['High Level Job Description'][0].lower()
+            skill_text = data_set['Technology'][0] + data_set['Primary Skill'][0].lower()
             jd_exp = data_set['Yrs Of Exp '][0]
-            title = data_set['Job Title'][0]
-            min_qual = data_set['Minimum Qualification'][0]
+            title = data_set['Job Title'][0].lower()
+            min_qual = data_set['Minimum Qualification'][0].lower()
             flask_return = core.res(search_st,skill_text,jd_exp,min_qual, title)
             df = pd.DataFrame(columns=['Title','Experience','Primary Skill','Technology','Min Qualification'])
             df = df.append({'Title': title,'Experience':jd_exp,'Primary Skill':data_set['Primary Skill'][0],'Technology':data_set['Technology'][0],'Min Qualification':data_set['Minimum Qualification'][0],'Job Description':data_set['High Level Job Description'][0]}, ignore_index=True)
