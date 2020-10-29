@@ -2,10 +2,12 @@ import glob
 import os
 import warnings
 from flask import (Flask,session,flash, redirect, render_template, request,
-                   url_for, send_from_directory)
+                   url_for, send_from_directory,jsonify)
 import core
 import pandas as pd
 import nltk
+import json
+import jsoncore as jsoncore
 
 
 warnings.filterwarnings(action='ignore', category=UserWarning, module='gensim')
@@ -45,6 +47,11 @@ application.config['UPLOAD_FOLDER'] = 'Upload-Resume'
 application.config['UPLOAD_JD_FOLDER'] = 'Upload-JD'
 application.config['ALLOWED_EXTENSIONS'] = set(['txt', 'pdf', 'doc', 'docx'])
 
+class Serializer(object):
+    @staticmethod
+    def serialize(object):
+        return json.dumps(object, default=lambda o: o.__dict__.values()[0])
+    
 class jd:
     def __init__(self, df,resumeObject):
         self.df = df
@@ -76,6 +83,7 @@ def logout():
 def home():
     checkSession() 
     return render_template('index.html')
+
 @application.route('/results', methods=['GET', 'POST'])
 def res():
     if request.method == 'POST':
@@ -99,6 +107,33 @@ def res():
             
         return render_template('result.html', results = result)
 
+""" this method will return json response of scan """
+@application.route('/scan', methods=['GET', 'POST'])
+def scan():
+    if request.method == 'GET':
+        #os.chdir(app.config['UPLOAD_JD_FOLDER'])
+        jd_file_path = rootpath+pathSeprator+application.config['UPLOAD_JD_FOLDER']+pathSeprator
+        files = glob.glob(jd_file_path+'*.xlsx')
+        finalResult = {}
+        print("JD files to be processed ",len(files))
+        index = 0
+        for file in files:
+            data_set = pd.read_excel(file)
+            search_st = data_set['High Level Job Description'][0].lower()
+            skill_text = data_set['Technology'][0] + data_set['Primary Skill'][0].lower()
+            jd_exp = data_set['Yrs Of Exp '][0]
+            title = data_set['Job Title'][0].lower()
+            min_qual = data_set['Minimum Qualification'][0].lower()
+            flask_return = jsoncore.res(search_st,skill_text,jd_exp,min_qual, title)
+            finalResult[title]=flask_return
+        
+        #return jsonify(scanResult=finalResult)
+        return json.dumps(finalResult, separators=(',', ':'))
+        #return application.response_class(response=Serializer.serialize(result),status=200,mimetype='application/json')
+
+@application.route("/users", methods=['GET'])
+def get_user():
+    return application.response_class(response='"user": "John Doe"',status=200,mimetype='application/json')
 
 @application.route('/uploadResume', methods=['GET', 'POST'])
 def uploadResume():
