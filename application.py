@@ -108,15 +108,45 @@ def res():
         return render_template('result.html', results = result)
 
 """ this method will return json response of scan """
-@application.route('/scan', methods=['GET', 'POST'])
+
+""" input json 
+
+{
+   "userInfo":{
+      "companyName":"abc",
+      "name":"username"
+   },
+   "Job Details":{
+      "Scan":"Scan1"
+   },
+   "weightage":{
+      "jd":15,
+      "skill":35,
+      "soft_skill":5,
+      "experience":{
+         "required":false,
+         "allocation":30
+      },
+      "minimum_qualification":15
+   },
+   "Must Have":[
+      "Must Have 1",
+      "Must Have 2",
+      "Must Have 3",
+      "Must Have 4",
+      "Must Have 5"
+   ]
+} """
+      
+@application.route('/scan', methods=['POST'])
 def scan():
-    if request.method == 'GET':
+    if request.method == 'POST':
         #os.chdir(app.config['UPLOAD_JD_FOLDER'])
         jd_file_path = rootpath+pathSeprator+application.config['UPLOAD_JD_FOLDER']+pathSeprator
         files = glob.glob(jd_file_path+'*.xlsx')
         finalResult = {}
         print("JD files to be processed ",len(files))
-        index = 0
+        print(request.get_json())
         for file in files:
             data_set = pd.read_excel(file)
             search_st = data_set['High Level Job Description'][0].lower()
@@ -130,10 +160,6 @@ def scan():
         #return jsonify(scanResult=finalResult)
         return json.dumps(finalResult, separators=(',', ':'))
         #return application.response_class(response=Serializer.serialize(result),status=200,mimetype='application/json')
-
-@application.route("/users", methods=['GET'])
-def get_user():
-    return application.response_class(response='"user": "John Doe"',status=200,mimetype='application/json')
 
 @application.route('/uploadResume', methods=['GET', 'POST'])
 def uploadResume():
