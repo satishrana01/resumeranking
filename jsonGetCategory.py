@@ -209,3 +209,10 @@ def NonTechnicalSkillScore(resume, jd_txt,input_json):
     TotalScore = sum(results.values())
     
     return TotalScore
+
+def dndResume(resumeText,must_have_skill):
+    for skill in must_have_skill:
+        if skill.lower() in resumeText:
+            return False
+        
+    return True    

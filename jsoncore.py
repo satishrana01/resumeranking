@@ -65,7 +65,7 @@ def getfilepath(loc):
     temp = temp.replace('\\', '/')
     return temp
    
-def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path):
+def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_have_skill):
     Resume_Vector = []
     Resume_skill_vector = []
     min_qual_vector = []
@@ -221,6 +221,8 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path):
        
         
         try:
+            if(skills.dndResume(temptext,must_have_skill)):
+                continue
             tttt = summarize(tttt, word_count=100) 
             text = [tttt]
             vector = vectorizer.transform(text)

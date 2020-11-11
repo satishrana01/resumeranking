@@ -203,6 +203,7 @@ def scan():
         input_json = request.get_json()
         aws_path = input_json["userInfo"]["name"]+pathSeprator+input_json["jobDetails"]["scan"]
         jd_file_path = rootpath+pathSeprator+aws_path+pathSeprator+application.config['UPLOAD_JD_FOLDER']+pathSeprator
+        must_have_skill = input_json["mustHave"]
         print(jd_file_path)
         files = glob.glob(jd_file_path+'*.xlsx')
         finalResult = {}
@@ -214,7 +215,7 @@ def scan():
             jd_exp = data_set['Yrs Of Exp '][0]
             title = data_set['Job Title'][0].lower()
             min_qual = data_set['Minimum Qualification'][0].lower()
-            flask_return = jsoncore.res(search_st,skill_text,jd_exp,min_qual, title,input_json,aws_path)
+            flask_return = jsoncore.res(search_st,skill_text,jd_exp,min_qual, title,input_json,aws_path,must_have_skill)
             print(flask_return)
             finalResult[title]=flask_return
         
