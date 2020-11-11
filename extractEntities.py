@@ -20,11 +20,9 @@ from text_process import remove_stopwords, to_lowercase
 def isJobTitleAvailable(jobTitle, tttt):
     if (tttt.find(jobTitle) != -1): 
         result = "True"
-        print ("True") 
         return result
     else: 
         result = "False"
-        print ("False") 
         return result
 
 #Function to extract names from the string using spacy

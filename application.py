@@ -1,18 +1,24 @@
 import glob
 import os
+import time
 import warnings
 from flask import (Flask,session,flash, redirect, render_template, request,
-                   url_for, send_from_directory,jsonify)
+                   url_for, send_from_directory,jsonify,g, abort)
 import core
+from flask_bcrypt import Bcrypt
 import pandas as pd
 import nltk
 import json
 import jsoncore as jsoncore
-
+from flask_sqlalchemy import SQLAlchemy
+from flask_httpauth import HTTPBasicAuth
+import jwt
+from werkzeug.security import generate_password_hash, check_password_hash
 
 warnings.filterwarnings(action='ignore', category=UserWarning, module='gensim')
 
 application = Flask(__name__)
+bcrypt = Bcrypt(application)
 
 nltk.download('punkt')
 nltk.download('averaged_perceptron_tagger')
@@ -22,40 +28,91 @@ global rootpath
 rootpath = os.getcwd()
 global pathSeprator
 pathSeprator = '/'
-global min_qual_weightage
-min_qual_weightage = 15
-global skill_threshold
-skill_threshold = 5
-global non_tech_weightage
-non_tech_weightage = 5
-global exp_weightage
-exp_weightage = 30
-global skill_weightage
-skill_weightage = 35
 
 #application.config.from_object(__name__) # load config from this file , flaskr.py
 
 # Load default config and override config from an environment variable
-application.config.update(dict(
-    USERNAME='admin',
-    PASSWORD='admin',
-    SECRET_KEY='development key',
-))
-
-
 application.config['UPLOAD_FOLDER'] = 'Upload-Resume'
 application.config['UPLOAD_JD_FOLDER'] = 'Upload-JD'
 application.config['ALLOWED_EXTENSIONS'] = set(['txt', 'pdf', 'doc', 'docx'])
+application.config['SECRET_KEY'] = '93be4be0-af90-44f3-b505-a473e099fb0f'
+application.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
+application.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
 
-class Serializer(object):
+# extensions
+db = SQLAlchemy(application)
+auth = HTTPBasicAuth()
+
+class User(db.Model):
+    __tablename__ = 'users'
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(32), index=True)
+    password_hash = db.Column(db.String(128))
+
+    def hash_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def verify_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
+    def generate_auth_token(self, expires_in=600):
+        return jwt.encode(
+            {'id': self.id, 'exp': time.time() + expires_in},
+            application.config['SECRET_KEY'], algorithm='HS256')
+
     @staticmethod
-    def serialize(object):
-        return json.dumps(object, default=lambda o: o.__dict__.values()[0])
-    
-class jd:
-    def __init__(self, df,resumeObject):
-        self.df = df
-        self.resumeObject = resumeObject
+    def verify_auth_token(token):
+        try:
+            data = jwt.decode(token, application.config['SECRET_KEY'],
+                              algorithms=['HS256'])
+							  
+        except:
+            return
+        return User.query.get(data['id'])
+
+
+@auth.verify_password
+def verify_password(username_or_token, password='test'):
+    # first try to authenticate by token
+    user = User.verify_auth_token(username_or_token)
+    if not user:
+        # try to authenticate with username/password
+        user = User.query.filter_by(username=username_or_token).first()
+        if not user or not user.verify_password(password):
+            return False
+    g.user = user
+    return True
+
+
+@application.route('/api/users', methods=['POST'])
+def new_user():
+    input_json = request.get_json()
+    username = input_json["username"]
+    password = input_json["password"]
+    if username is None or password is None:
+        abort(400)    # missing arguments
+    if User.query.filter_by(username=username).first() is not None:
+        abort(400)    # existing user
+    user = User(username=username)
+    user.hash_password(password)
+    db.session.add(user)
+    db.session.commit()
+    return (jsonify({'username': user.username}), 201,
+            {'Location': url_for('get_user', id=user.id, _external=True)})
+
+@application.route('/api/users/<int:id>')
+def get_user(id):
+    user = User.query.get(id)
+    if not user:
+        abort(400)
+    return jsonify({'username': user.username})
+
+@application.route('/api/rank/token',methods=['POST'])
+@auth.login_required
+def get_auth_token():
+    token = g.user.generate_auth_token(600)
+    return jsonify({'token': token.decode('ascii'), 'duration': 600})
+
 
 @application.route('/login', methods=['GET', 'POST'])
 def login():
@@ -116,8 +173,8 @@ def res():
       "companyName":"abc",
       "name":"username"
    },
-   "Job Details":{
-      "Scan":"Scan1"
+   "jobDetails":{
+      "scan":"scan1"
    },
    "weightage":{
       "jd":15,
@@ -129,7 +186,7 @@ def res():
       },
       "minimum_qualification":15
    },
-   "Must Have":[
+   "mustHave":[
       "Must Have 1",
       "Must Have 2",
       "Must Have 3",
@@ -138,15 +195,18 @@ def res():
    ]
 } """
       
-@application.route('/scan', methods=['POST'])
+@application.route('/api/rank/scan', methods=['POST'])
+@auth.login_required
 def scan():
     if request.method == 'POST':
         #os.chdir(app.config['UPLOAD_JD_FOLDER'])
-        jd_file_path = rootpath+pathSeprator+application.config['UPLOAD_JD_FOLDER']+pathSeprator
+        input_json = request.get_json()
+        aws_path = input_json["userInfo"]["name"]+pathSeprator+input_json["jobDetails"]["scan"]
+        jd_file_path = rootpath+pathSeprator+aws_path+pathSeprator+application.config['UPLOAD_JD_FOLDER']+pathSeprator
+        print(jd_file_path)
         files = glob.glob(jd_file_path+'*.xlsx')
         finalResult = {}
         print("JD files to be processed ",len(files))
-        print(request.get_json())
         for file in files:
             data_set = pd.read_excel(file)
             search_st = data_set['High Level Job Description'][0].lower()
@@ -154,10 +214,12 @@ def scan():
             jd_exp = data_set['Yrs Of Exp '][0]
             title = data_set['Job Title'][0].lower()
             min_qual = data_set['Minimum Qualification'][0].lower()
-            flask_return = jsoncore.res(search_st,skill_text,jd_exp,min_qual, title)
+            flask_return = jsoncore.res(search_st,skill_text,jd_exp,min_qual, title,input_json,aws_path)
+            print(flask_return)
             finalResult[title]=flask_return
         
         #return jsonify(scanResult=finalResult)
+        print(finalResult)
         return json.dumps(finalResult, separators=(',', ':'))
         #return application.response_class(response=Serializer.serialize(result),status=200,mimetype='application/json')
 
@@ -250,12 +312,14 @@ def checkSession():
     isLoggedIn = bool(session.get('logged_in'))
     if isLoggedIn:
         return redirect(url_for('login'))
-       
+
 if __name__ == '__main__':
    # app.run(debug = True) 
     # app.run('127.0.0.1' , 5000 , debug=True)
     #initialize()
-    application.run()
+    if not os.path.exists('db.sqlite'):
+        db.create_all()
+    application.run(debug=True)
     
     #app.run('0.0.0.0' , 5000 , debug=True , threaded=True)
     

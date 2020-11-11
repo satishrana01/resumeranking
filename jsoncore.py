@@ -12,7 +12,7 @@ from gensim.summarization import summarize
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import PyPDF2
-import getCategory as skills
+import jsonGetCategory as skills
 from extract_exp import ExtractExp
 from striprtf.striprtf import rtf_to_text
 from pathlib import Path
@@ -31,16 +31,11 @@ global rootpath
 rootpath = os.getcwd()
 global pathSeprator
 pathSeprator = '/'
-global min_qual_weightage
-min_qual_weightage = 15
 global skill_threshold
 skill_threshold = 5
-global non_tech_weightage
-non_tech_weightage = 5
 global exp_weightage
 exp_weightage = 30
-global skill_weightage
-skill_weightage = 35
+
 
 class ResultElement:
     def __init__(self, jd, filename,skillRank, totalExp, phoneNo, email, nonTechSkills,exp,
@@ -69,16 +64,8 @@ def getfilepath(loc):
     temp = str(loc)
     temp = temp.replace('\\', '/')
     return temp
-"""
-def parse_docfile(file):
-    pythoncom.CoInitialize()
-    wordapp = Dispatch("Word.Application")
-    doc = wordapp.Documents.Open(os.getcwd()+"/"+file)
-    docText = doc.Content.Text
-    wordapp.Quit()
-    return docText
-"""    
-def res(jobfile,skillset,jd_exp,min_qual, job_title):
+   
+def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path):
     Resume_Vector = []
     Resume_skill_vector = []
     min_qual_vector = []
@@ -100,15 +87,11 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title):
     Resumes = []
     Temp_pdf = []
     Resume_title = []
-    #if count == 0:
-    #    os.chdir("..")
-    #    print(os.getcwd())
-    #    os.chdir('Upload-Resume')
-    jd_weightage = 15
+    jd_weightage = input_json["weightage"]["jd"]
     not_found = 'Not Found'
     extract_exp = ExtractExp()
     
-    resumePath = rootpath+pathSeprator+'Upload-Resume'
+    resumePath = rootpath+pathSeprator+aws_path+pathSeprator+'Upload-Resume'
     
     for file in glob.glob(resumePath+'/*.pdf'):
         LIST_OF_FILES_PDF.append(file)
@@ -123,9 +106,6 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title):
 
     LIST_OF_FILES = LIST_OF_FILES_DOC + LIST_OF_FILES_DOCX + LIST_OF_FILES_PDF
     # LIST_OF_FILES.remove("antiword.exe")
-    print("This is LIST OF FILES")
-    print(LIST_OF_FILES)
-
     
     print("####### PARSING ########")
     #pythoncom.CoInitialize()
@@ -136,10 +116,8 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title):
         rr= Temp[0].rsplit('/',1)
         
         Resume_title.append(rr[-1])
-        print("Resume title is {}".format(Resume_title))
         if Temp[1] == "pdf" or Temp[1] == "Pdf" or Temp[1] == "PDF":
             try:
-                print(count," This is PDF" , i)
                 with open(i,'rb') as pdf_file:
                     
                     read_pdf = PyPDF2.PdfFileReader(pdf_file)
@@ -172,7 +150,6 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title):
             #parse_docfile(i)
          
         elif Temp[1] == "rtf" or Temp[1] == "Rtf" or Temp[1] == "RTF":
-            print(count," This is Rtf" , i)
                 
             try:
                 
@@ -186,7 +163,6 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title):
             except Exception as e: print(e)
                 
         elif Temp[1] == "docx" or Temp[1] == "Docx" or Temp[1] == "DOCX":
-            print(count," This is DOCX" , i)
             try:
                 a = textract.process(i)
                 a = a.replace(b'\n',  b' ')
@@ -198,7 +174,6 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title):
             except Exception as e: print(e)
             
         elif Temp[1] == "txt" or Temp[1] == "Txt" or Temp[1] == "TXT":
-            print(count," This is txt" , i)
             try:
                 f = open(file,'r')
                 lines = f.readlines()
@@ -250,10 +225,10 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title):
             text = [tttt]
             vector = vectorizer.transform(text)
             Resume_Vector.append(vector.toarray())
-            min_qual_score = skills.minQualificationScore(temptext,min_qual)
+            min_qual_score = skills.minQualificationScore(temptext,min_qual,input_json)
             min_qual_vector.append(min_qual_score)
             confidence = {}
-            score = int((min_qual_score/min_qual_weightage)*100)
+            score = int((min_qual_score/input_json["weightage"]["minimum_qualification"])*100)
             confidence['confidence'] = score
             if score >= 60:
                 confidence['min qual'] = 'Yes'
@@ -262,7 +237,7 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title):
             else:
                 confidence['min qual'] = 'No'
             is_min_qual.append(confidence)
-            Resume_skill_vector.append(skills.programmingScore(temptext,jobfile+skillset))
+            Resume_skill_vector.append(skills.programmingScore(temptext,jobfile+skillset,input_json))
             Resume_skill_list.append(skills.skillSetListMatchedWithJD(temptext,jobfile+skillset))
             Resume_non_skill_list.append(skills.nonTechSkillSetListMatchedWithJD(temptext,jobfile+skillset))
             experience = extract_exp.get_features(temptext)
@@ -284,7 +259,7 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title):
                 
            
             Resume_exp_vector.append(extract_exp.get_exp_weightage(str(jd_exp),experience))
-            Resume_nonTechSkills_vector.append(skills.NonTechnicalSkillScore(temptext,jobfile+skillset))
+            Resume_nonTechSkills_vector.append(skills.NonTechnicalSkillScore(temptext,jobfile+skillset,input_json))
             print("Rank prepared for ",Ordered_list_Resume.__getitem__(index))
         except Exception:
             print(traceback.format_exc())
@@ -296,14 +271,14 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title):
         samples = i
         similarity = cosine_similarity(samples,Job_Desc)[0][0]
         """Ordered_list_Resume_Score.extend(similarity)"""
-        #print(Resume_skill_vector)
-        #print(Resume_nonTechSkills_vector)
-        #print(Resume_exp_vector)
         final_rating = round(similarity*jd_weightage,2)+Resume_skill_vector.__getitem__(index)+Resume_nonTechSkills_vector.__getitem__(index)+Resume_exp_vector.__getitem__(index)+min_qual_vector.__getitem__(index)
         res = ResultElement(round(similarity*jd_weightage,2), os.path.basename(tempList.__getitem__(index)),round(Resume_skill_vector.__getitem__(index),2),
                            Resume_total_exp_vector.__getitem__(index), Resume_phoneNo_vector.__getitem__(index),Resume_email_vector.__getitem__(index),
                            Resume_nonTechSkills_vector.__getitem__(index),Resume_exp_vector.__getitem__(index),round(final_rating,2),Resume_skill_list.__getitem__(index),
                            Resume_non_skill_list.__getitem__(index),min_qual_vector.__getitem__(index),is_min_qual.__getitem__(index),Resume_ApplicantName_vector.__getitem__(index),Resume_JobTitleAvailability_vector.__getitem__(index))
         flask_return.append(res.toJSON())
+        #print(res.toJSON())
     #flask_return.sort(key=lambda x: x.finalRank, reverse=True)
+    flask_return = [word.replace('\n    ','') for word in flask_return]
     return flask_return
+
