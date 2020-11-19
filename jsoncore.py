@@ -18,6 +18,7 @@ from striprtf.striprtf import rtf_to_text
 from pathlib import Path
 import json
 
+
 #os.chdir('Upload-JD')
 #ffile = glob.glob('*.xlsx', recursive=False)
 #job_data_set = pd.read_excel(ffile[0])
@@ -28,7 +29,9 @@ import json
 warnings.filterwarnings(action='ignore', category=UserWarning, module='gensim')
 
 global rootpath
-rootpath = os.getcwd()
+global bucket_name
+bucket_name = 'resume-rank-bucket' 
+rootpath = "resume-rank-bucket"
 global pathSeprator
 pathSeprator = '/'
 global skill_threshold
@@ -65,7 +68,7 @@ def getfilepath(loc):
     temp = temp.replace('\\', '/')
     return temp
    
-def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_have_skill):
+def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_have_skill, s3_resource, fs, bucket_name):
     Resume_Vector = []
     Resume_skill_vector = []
     min_qual_vector = []
@@ -91,17 +94,27 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_hav
     not_found = 'Not Found'
     extract_exp = ExtractExp()
     
-    resumePath = rootpath+pathSeprator+aws_path+pathSeprator+'Upload-Resume'
+    resumePath = bucket_name+pathSeprator+aws_path+pathSeprator+'Upload-Resume'
     
-    for file in glob.glob(resumePath+'/*.pdf'):
+    bucket = s3_resource.Bucket(bucket_name)
+    for obj in bucket.objects.all():
+        if '{}/'.format(resumePath) in obj.key:
+            #print(obj.key)
+            Temp = obj.key.split('/',-1)
+            #print(Temp)
+            Resume_title = Resume_title + [Temp[-1]]
+        
+    print('length of resume list is ', len(resume_name_inS3))
+    
+    for file in fs.glob(resumePath+'/*.pdf'):
         LIST_OF_FILES_PDF.append(file)
-    for file in glob.glob(resumePath+'/*.doc'):
+    for file in fs.glob(resumePath+'/*.doc'):
         LIST_OF_FILES_DOC.append(file)
-    for file in glob.glob(resumePath+'/*.docx'):
+    for file in fs.glob(resumePath+'/*.docx'):
         LIST_OF_FILES_DOCX.append(file)
-    for file in glob.glob(resumePath+'/*.rtf'):
+    for file in fs.glob(resumePath+'/*.rtf'):
         LIST_OF_FILES_DOCX.append(file)
-    for file in glob.glob(resumePath+'/*.txt'):
+    for file in fs.glob(resumePath+'/*.txt'):
         LIST_OF_FILES_DOCX.append(file)     
 
     LIST_OF_FILES = LIST_OF_FILES_DOC + LIST_OF_FILES_DOCX + LIST_OF_FILES_PDF
@@ -112,13 +125,13 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_hav
     
     for count,i in enumerate(LIST_OF_FILES):
        
-        Temp = i.rsplit('.',1)
-        rr= Temp[0].rsplit('/',1)
+        Temp = i.rsplit('.',-1)
+        #rr= Temp[0].rsplit('/',1)
         
-        Resume_title.append(rr[-1])
+        #Resume_title.append(rr[-1])
         if Temp[1] == "pdf" or Temp[1] == "Pdf" or Temp[1] == "PDF":
             try:
-                with open(i,'rb') as pdf_file:
+                with fs.open(i,'rb') as pdf_file:
                     
                     read_pdf = PyPDF2.PdfFileReader(pdf_file)
                     # page = read_pdf.getPage(0)
@@ -175,7 +188,7 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_hav
             
         elif Temp[1] == "txt" or Temp[1] == "Txt" or Temp[1] == "TXT":
             try:
-                f = open(file,'r')
+                f = fs.open(i,'r')
                 lines = f.readlines()
                 a =  "\n".join(lines)
                 c = [str(a)]
@@ -188,7 +201,7 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_hav
         elif Temp[1] == "ex" or Temp[1] == "Exe" or Temp[1] == "EXE":
             print("This is EXE" , i)
             pass
-
+    print("resume list are {} and {}".format(len(Ordered_list_Resume), Ordered_list_Resume))
     print("Done Parsing.")
     print("Please wait we are preparing ranking.")
 

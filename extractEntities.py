@@ -40,9 +40,11 @@ def extract_name(resume):
 
 #Function to extract Phone Numbers from string using regular expressions
 def extract_phone_numbers(string):
-    r = re.compile(r'(\d{3}[-\.\s]??\d{3}[-\.\s]??\d{4}|\(\d{3}\)\s*\d{3}[-\.\s]??\d{4}|\d{3}[-\.\s]??\d{4})')
+    #r = re.compile(r'(\d{3}[-\.\s]??\d{3}[-\.\s]??\d{4}|\(\d{3}\)\s*\d{3}[-\.\s]??\d{4}|\d{3}[-\.\s]??\d{4})')
+    #phone_numbers = r.findall(string)
+    r = re.compile(r'\+\d \d{3}-\d{3}-\d{4}|\d \d{3}-\d{3}-\d{4}|\d-\d{3}-\d{3}-\d{4}|\d{3}-\d{3}-\d{4}|\d{3} \d{3} \d{4}|\d{10}|\+\d{2} \d{10}|\+\d{2}\d{10}|\d{10}|\(\d{3}\) \d{4}-\d{4}|\+\d{3} \d{4}-\d{4}|\d{4}-\d{4}|\d{3}-\d{4}|\(\d{4}\) \d{3}-\d{3}|\(\d{5}\) \d{2}-\d{4}|\(\d{3}\) \d{3}-\d{3}-\d{4}|\d{2} \d{5}-\d{4}|\d{3} \d{3} \d{3}|9 \d{4} \d{4}|\d{2} \d{4} \d{4}|9\d{4} \d{4}|\(0\d{2}\) \d{4}-\d{4}|\(0\d{3}\) \d{3}-\d{4}|\d{4} \d{4}|\+52 \d{4} \d{4}|\+52 \(\d{2}\) \d{4}-\d{4}|\+52 \d \d{5} \d{4}|\(\d{2}\) \d{4}-\d{4}|\(\d{3}\) \d{3}-\d{2}-\d{2}|\+52 \(\d{3}\) \d{3}-\d{2}-\d{2}|\+52 \d{3} \d{3} \d{4}|\d{3} \d{2} \d{2}|\d{3} \d{3} \d{4}|1 \d{3} \d{3}-\d{4}|0\d{5} \d{6}|\+44 \d{4} \d{6}|0\d{3} \d{6}|\+380 \d{2} \d{3} \d{2} \d{2}|\+38 0\d{2} \d{7}|\+38 \(0\d{2}\) \d{7}|1\d{2} \d{4} \d{4}|09\d{2} \d{3} \d{3}|\+98 9\d{2} \d{3} \d{4}|01\d{1}-\d{3} \d{4}|01\d{1}-\d{7}|\+63 \(\d{3}\) \d{3} \d{4}|0 \(\d{3}\) \d{3} \d{4}|\+65-\d{4}-\d{4}|\+65 \d{4} \d{4}|\(09\d\) \d{6}|09\d \d{6}|\(02\) \d{4} \d{4}|02 \d{8}|0\d \d{3} \d{4}|\+49 \d{2} \d{6}|\+49 \d{4} \d{6}|0\d{4} \d{5}|0\d \d{2} \d{2} \d{2} \d{2}|\d{2} \d{2} \d{2} \d{2}|\d{2} \d{3} \d{3}|\d{8}|04\d{2} \d{2} \d{2} \d{2}|04\d{2} \d{3} \d{3}|08\d \d{3} \d{4}|01 \d{3} \d{4}|021 \d{3} \d{4}|064 \d{3} \d{4}|\d{3} \d{2} \d{3}|\(\d{3}\) \d{2} \d{3}|\(\d{2}\) \d{2} \d{2} \d{2}|\d{3} \d{2} \d{2} \d{2}')
     phone_numbers = r.findall(string)
-    return [re.sub(r'\D', '', number) for number in phone_numbers if len(number) >9]
+    return phone_numbers
 
 #Function to extract Email address from a string using regular expressions
 def extract_email_addresses(string):

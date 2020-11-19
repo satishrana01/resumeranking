@@ -9,11 +9,14 @@ from flask_bcrypt import Bcrypt
 import pandas as pd
 import nltk
 import json
+from extract_exp import ExtractExp
 import jsoncore as jsoncore
 from flask_sqlalchemy import SQLAlchemy
 from flask_httpauth import HTTPBasicAuth
 import jwt
 from werkzeug.security import generate_password_hash, check_password_hash
+import boto3
+import s3fs
 
 warnings.filterwarnings(action='ignore', category=UserWarning, module='gensim')
 
@@ -28,6 +31,18 @@ global rootpath
 rootpath = os.getcwd()
 global pathSeprator
 pathSeprator = '/'
+global bucket_name
+bucket_name = 'resume-rank-bucket'
+Ordered_list_jd = []
+jd_text_data = []
+Jd_total_exp_vector = []
+LIST_OF_FILES_TXT_JD = []
+LIST_OF_FILES_XLSX_JD = []
+LIST_OF_FILES_JD = []
+
+s3 = boto3.client('s3')
+s3_resource = boto3.resource("s3")
+fs = s3fs.S3FileSystem(anon=False)
 
 #application.config.from_object(__name__) # load config from this file , flaskr.py
 
@@ -198,14 +213,74 @@ def res():
 @application.route('/api/rank/scan', methods=['POST'])
 @auth.login_required
 def scan():
+    extract_exp = ExtractExp()
     if request.method == 'POST':
         #os.chdir(app.config['UPLOAD_JD_FOLDER'])
         input_json = request.get_json()
         aws_path = input_json["userInfo"]["name"]+pathSeprator+input_json["jobDetails"]["scan"]
-        jd_file_path = rootpath+pathSeprator+aws_path+pathSeprator+application.config['UPLOAD_JD_FOLDER']+pathSeprator
+        jd_file_path = bucket_name+pathSeprator+aws_path+pathSeprator+application.config['UPLOAD_JD_FOLDER']+pathSeprator
         must_have_skill = input_json["mustHave"]
-        print(jd_file_path)
-        files = glob.glob(jd_file_path+'*.xlsx')
+        print("JD file path is ",jd_file_path)
+        
+        for file in fs.glob(jd_path+'/*.xlsx'):
+            LIST_OF_FILES_TXT_JD.append(file)
+        for file in fs.glob(jd_path+'/*.txt'):
+            LIST_OF_FILES_XLSX_JD.append(file)
+            
+        LIST_OF_FILES_JD = LIST_OF_FILES_TXT_JD + LIST_OF_FILES_XLSX_JD
+        print("JD files to be processed ",LIST_OF_FILES_JD) 
+        
+        for count,i in enumerate(LIST_OF_FILES_JD):
+            print('i is', i)
+            Temp = i.rsplit('.',1)
+            print(Temp)
+            
+            if Temp[-1] == "xlsx" or Temp[-1] == "Xlsx" or Temp[-1] == "XLSX":
+                try:
+                    print('file location is', 's3://{}/{}.xlsx'.format(jd_path, i))
+                    data_set = pd.read_excel("s3://{}".format(i))
+                    Ordered_list_jd.append(i)
+                    search_st = data_set['High Level Job Description'][0].lower()
+                    skill_text = data_set['Technology'][0] + data_set['Primary Skill'][0].lower()
+                    jd_exp = data_set['Yrs Of Exp '][0]
+                    title = data_set['Job Title'][0].lower()
+                    min_qual = data_set['Minimum Qualification'][0].lower()
+                    flask_return = jsoncore.res(search_st,skill_text,jd_exp,min_qual, title,input_json,aws_path,must_have_skill, s3_resource, fs, bucket_name)
+                    print(flask_return)
+                    finalResult[title]=flask_return
+                except Exception as e: 
+                    print(e)
+                    print(traceback.format_exc())
+       
+            
+                
+            elif Temp[-1] == "txt" or Temp[-1] == "Txt" or Temp[-1] == "TXT":  
+                print(count," This is txt" , i)
+                try:
+                    f = fs.open(i,'r')
+                    lines = f.readlines()
+                    a =  "\n".join(lines)
+                    c = [str(a)]
+                    jd_text_data.extend(c)
+                    Ordered_list_jd.append(i)
+                    f.close()
+                    search_st = jd_text_data[0]
+                    skill_text = jd_text_data[0]
+                    experience = extract_exp.get_features(temptext)
+                    jd_exp = experience
+                    title = jd_text_data[0][0:20] # Getting substring with initial 20 chars
+                    min_qual = ""
+                    flask_return = jsoncore.res(search_st,skill_text,jd_exp,min_qual, title,input_json,aws_path,must_have_skill, s3_resource, fs, bucket_name)
+                    print(flask_return)
+                    finalResult[title]=flask_return
+                except Exception as e: print(e)    
+        print("JD list is ", Ordered_list_jd)    
+        #return jsonify(scanResult=finalResult)
+        print(finalResult)
+        return json.dumps(finalResult, separators=(',', ':'))
+        #return application.response_class(response=Serializer.serialize(result),status=200,mimetype='application/json')
+         
+        """files = glob.glob(jd_file_path+'*.xlsx')
         finalResult = {}
         print("JD files to be processed ",len(files))
         for file in files:
@@ -222,8 +297,8 @@ def scan():
         #return jsonify(scanResult=finalResult)
         print(finalResult)
         return json.dumps(finalResult, separators=(',', ':'))
-        #return application.response_class(response=Serializer.serialize(result),status=200,mimetype='application/json')
-
+        #return application.response_class(response=Serializer.serialize(result),status=200,mimetype='application/json')'
+"""
 @application.route('/uploadResume', methods=['GET', 'POST'])
 def uploadResume():
     checkSession()
