@@ -104,7 +104,7 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_hav
             #print(Temp)
             Resume_title = Resume_title + [Temp[-1]]
         
-    print('length of resume list is ', len(resume_name_inS3))
+    #print('length of resume list is ', len(resume_name_inS3))
     
     for file in fs.glob(resumePath+'/*.pdf'):
         LIST_OF_FILES_PDF.append(file)
@@ -119,7 +119,7 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_hav
 
     LIST_OF_FILES = LIST_OF_FILES_DOC + LIST_OF_FILES_DOCX + LIST_OF_FILES_PDF
     # LIST_OF_FILES.remove("antiword.exe")
-    
+    print("Resume title",Resume_title)
     print("####### PARSING ########")
     #pythoncom.CoInitialize()
     
@@ -257,7 +257,7 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_hav
             Resume_non_skill_list.append(skills.nonTechSkillSetListMatchedWithJD(temptext,jobfile+skillset))
             experience = extract_exp.get_features(temptext)
             Resume_total_exp_vector.append(experience)
-            temp_applicantName = entity.extractPersonName(temptext, str(Resume_title.__getitem__(index)))
+            temp_applicantName = entity.extractPersonName(temptext, str(Ordered_list_Resume.__getitem__(index)))
             Resume_ApplicantName_vector.append(temp_applicantName)
             bool_jobTitleFound = entity.isJobTitleAvailable(job_title, temptext)
             Resume_JobTitleAvailability_vector.append(bool_jobTitleFound)

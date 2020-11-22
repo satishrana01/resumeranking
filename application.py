@@ -40,7 +40,13 @@ LIST_OF_FILES_TXT_JD = []
 LIST_OF_FILES_XLSX_JD = []
 LIST_OF_FILES_JD = []
 
-s3 = boto3.client('s3')
+#os.environ['AWS_PROFILE'] = "resumerank"
+#os.environ['AWS_DEFAULT_REGION'] = "ap-south-1"
+#s3 = boto3.client('s3')
+
+#s3 = boto3.client('s3', region_name='ap-south-1')
+#response = s3.list_buckets()
+#print('Regions: >>>>', response)
 s3_resource = boto3.resource("s3")
 fs = s3fs.S3FileSystem(anon=False)
 
@@ -218,18 +224,18 @@ def scan():
         #os.chdir(app.config['UPLOAD_JD_FOLDER'])
         input_json = request.get_json()
         aws_path = input_json["userInfo"]["name"]+pathSeprator+input_json["jobDetails"]["scan"]
-        jd_file_path = bucket_name+pathSeprator+aws_path+pathSeprator+application.config['UPLOAD_JD_FOLDER']+pathSeprator
+        jd_file_path = bucket_name+pathSeprator+aws_path+pathSeprator+application.config['UPLOAD_JD_FOLDER']
         must_have_skill = input_json["mustHave"]
         print("JD file path is ",jd_file_path)
         
-        for file in fs.glob(jd_path+'/*.xlsx'):
+        for file in fs.glob(jd_file_path+'/*.xlsx'):
             LIST_OF_FILES_TXT_JD.append(file)
-        for file in fs.glob(jd_path+'/*.txt'):
+        for file in fs.glob(jd_file_path+'/*.txt'):
             LIST_OF_FILES_XLSX_JD.append(file)
             
         LIST_OF_FILES_JD = LIST_OF_FILES_TXT_JD + LIST_OF_FILES_XLSX_JD
         print("JD files to be processed ",LIST_OF_FILES_JD) 
-        
+        finalResult = {}
         for count,i in enumerate(LIST_OF_FILES_JD):
             print('i is', i)
             Temp = i.rsplit('.',1)
@@ -237,7 +243,7 @@ def scan():
             
             if Temp[-1] == "xlsx" or Temp[-1] == "Xlsx" or Temp[-1] == "XLSX":
                 try:
-                    print('file location is', 's3://{}/{}.xlsx'.format(jd_path, i))
+                    print('file location is', 's3://{}/{}.xlsx'.format(jd_file_path, i))
                     data_set = pd.read_excel("s3://{}".format(i))
                     Ordered_list_jd.append(i)
                     search_st = data_set['High Level Job Description'][0].lower()
@@ -250,7 +256,7 @@ def scan():
                     finalResult[title]=flask_return
                 except Exception as e: 
                     print(e)
-                    print(traceback.format_exc())
+                    #print(traceback.format_exc())
        
             
                 
