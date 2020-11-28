@@ -291,9 +291,9 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_hav
                            Resume_total_exp_vector.__getitem__(index), Resume_phoneNo_vector.__getitem__(index),Resume_email_vector.__getitem__(index),
                            Resume_nonTechSkills_vector.__getitem__(index),Resume_exp_vector.__getitem__(index),round(final_rating,2),Resume_skill_list.__getitem__(index),
                            Resume_non_skill_list.__getitem__(index),min_qual_vector.__getitem__(index),is_min_qual.__getitem__(index),Resume_ApplicantName_vector.__getitem__(index),Resume_JobTitleAvailability_vector.__getitem__(index))
-        flask_return.append(res.toJSON())
+        flask_return.append(res)
         #print(res.toJSON())
     #flask_return.sort(key=lambda x: x.finalRank, reverse=True)
-    flask_return = [word.replace('\n    ','') for word in flask_return]
+    #flask_return = [word.replace('\n    ','') for word in flask_return]
     return flask_return
 

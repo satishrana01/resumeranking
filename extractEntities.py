@@ -13,6 +13,7 @@ nltk.download('wordnet')
 nltk.download('punkt')
 from nltk.corpus import wordnet
 from text_process import remove_stopwords, to_lowercase
+import os
 
 #from collections import Counter
 #import en_core_web_sm
@@ -54,7 +55,8 @@ def extract_email_addresses(string):
 def extractPersonName(tttt, resumeTitle):
         #a = 'Cv_saurabh+keshari_1234_Resume'
         #a = "1234"
-        titleSplit = re.split(r'[`\-=~!@#$%^&*()_+\[\]{};\'\\:"|<,./<>?]', resumeTitle)
+        head, tail = os.path.split(resumeTitle)
+        titleSplit = re.split(r'[`\-=~!@#$%^&*()_+\[\]{};\'\\:"|<,./<>?]', tail)
         title_isNotDigit = []
         for word in titleSplit:
             if not word.isdigit():
@@ -110,7 +112,7 @@ def extractPersonName(tttt, resumeTitle):
          "creative", "Insight", "curiosity", "curious", "Openness", "Teamwork", "Time management", "Emotional intelligence", 
          "quick learner", "problem solver","Customer-service skills", "Planning and organizing", "innovative", "Thinking innovatively and creatively", "Resourceful", "Flexible", "Able to manage own time", "Having self-esteem", 
          "Innovation skills", "Enterprise skills", "Civic or citizenship knowledge and skills", "Sociability", "Self-management", "Integrity", "Honesty", "Human resources", 
-         "Participates as a team member", "Works with diversity", "Exercises leadership", "leadership", "Exercises leadership", "Monitors and corrects performance", "Understands systems", 'experience', 'exp', 'exp.']
+         "Participates as a team member", "Works with diversity", "Exercises leadership", "leadership", "Exercises leadership", "Monitors and corrects performance", "Understands systems", 'experience', 'exp', 'exp.','Resume','resume']
         querywords = personName.split()
         
         resultwords  = [word for word in querywords if word.lower() not in stopwords]

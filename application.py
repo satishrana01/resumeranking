@@ -238,6 +238,7 @@ def scan():
         LIST_OF_FILES_JD = LIST_OF_FILES_TXT_JD + LIST_OF_FILES_XLSX_JD
         print("JD files to be processed ",LIST_OF_FILES_JD) 
         finalResult = {}
+        finalResult["userInfo"] = { "companyName":input_json["userInfo"]["companyName"], "name":input_json["userInfo"]["name"], "accountType":input_json["userInfo"]["accountType"], "dateOfScan":now.strftime("%d/%m/%Y %H:%M:%S")}
         for count,i in enumerate(LIST_OF_FILES_JD):
             print('i is', i)
             Temp = i.rsplit('.',1)
@@ -256,6 +257,7 @@ def scan():
                     flask_return = jsoncore.res(search_st,skill_text,jd_exp,min_qual, title,input_json,aws_path,must_have_skill, s3_resource, fs, bucket_name)
                     print(flask_return)
                     finalResult[title]=flask_return
+                    return json.dumps(finalResult,default=lambda o: o.__dict__)
                 except Exception as e: 
                     print(e)
                     #print(traceback.format_exc())
@@ -281,12 +283,10 @@ def scan():
                     flask_return = jsoncore.res(search_st,skill_text,jd_exp,min_qual, title,input_json,aws_path,must_have_skill, s3_resource, fs, bucket_name)
                     print(flask_return)
                     finalResult[title]=flask_return
+                    return json.dumps(finalResult, separators=(',', ':'))
                 except Exception as e: print(e)    
-        print("JD list is ", Ordered_list_jd)    
-        #return jsonify(scanResult=finalResult)
-        finalResult["userInfo"] = '{ "companyName":'+'"'+input_json["userInfo"]["companyName"]+'", "name":'+input_json["userInfo"]["name"]+'", "accountType":"'+input_json["userInfo"]["accountType"]+'", "dateOfScan":"'+now.strftime("%d/%m/%Y %H:%M:%S")+'"}'
-        print(finalResult)
-        return json.dumps(finalResult, separators=(',', ':'))
+        #print(finalResult)
+        #return json.dumps(finalResult, separators=(',', ':'))
         #return application.response_class(response=Serializer.serialize(result),status=200,mimetype='application/json')
          
         """files = glob.glob(jd_file_path+'*.xlsx')
