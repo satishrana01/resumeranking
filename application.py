@@ -17,6 +17,7 @@ import jwt
 from werkzeug.security import generate_password_hash, check_password_hash
 import boto3
 import s3fs
+from datetime import datetime
 
 warnings.filterwarnings(action='ignore', category=UserWarning, module='gensim')
 
@@ -222,6 +223,7 @@ def scan():
     extract_exp = ExtractExp()
     if request.method == 'POST':
         #os.chdir(app.config['UPLOAD_JD_FOLDER'])
+        now = datetime.now()
         input_json = request.get_json()
         aws_path = input_json["userInfo"]["name"]+pathSeprator+input_json["jobDetails"]["scan"]
         jd_file_path = bucket_name+pathSeprator+aws_path+pathSeprator+application.config['UPLOAD_JD_FOLDER']
@@ -272,7 +274,7 @@ def scan():
                     f.close()
                     search_st = jd_text_data[0]
                     skill_text = jd_text_data[0]
-                    experience = extract_exp.get_features(temptext)
+                    experience = extract_exp.get_features(search_st)
                     jd_exp = experience
                     title = jd_text_data[0][0:20] # Getting substring with initial 20 chars
                     min_qual = ""
@@ -282,6 +284,7 @@ def scan():
                 except Exception as e: print(e)    
         print("JD list is ", Ordered_list_jd)    
         #return jsonify(scanResult=finalResult)
+        finalResult["userInfo"] = '{ "companyName":'+'"'+input_json["userInfo"]["companyName"]+'", "name":'+input_json["userInfo"]["name"]+'", "accountType":"'+input_json["userInfo"]["accountType"]+'", "dateOfScan":"'+now.strftime("%d/%m/%Y %H:%M:%S")+'"}'
         print(finalResult)
         return json.dumps(finalResult, separators=(',', ':'))
         #return application.response_class(response=Serializer.serialize(result),status=200,mimetype='application/json')

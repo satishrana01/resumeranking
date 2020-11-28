@@ -6,7 +6,7 @@ rootpath = os.getcwd()
 global pathSeprator
 pathSeprator = '/'
 global skill_threshold
-skill_threshold = 5
+skill_threshold = 1
 
 def programmingScore(resume, jdTxt,input_json):
     
