@@ -1,5 +1,6 @@
 import string
 import os
+from textblob import TextBlob
 
 global rootpath
 rootpath = os.getcwd()
@@ -50,6 +51,18 @@ def programmingScore(resume, jdTxt,input_json):
     TotalScore = sum(results.values())
     
     return TotalScore
+
+def word_polarity(resume_text):
+    
+    neg_word_list=[]
+
+    for word in resume_text.split():               
+        testimonial = TextBlob(word)
+        if testimonial.sentiment.polarity <= -0.5:
+            neg_word_list.append(word)
+        
+     
+    return neg_word_list    
 
 def minQualificationScore(resume, jdTxt,input_json):
     programming = loadSkillSetDB(rootpath+pathSeprator+"skillDB.txt")

@@ -3,7 +3,7 @@ import os
 import time
 import warnings
 from flask import (Flask,session,flash, redirect, render_template, request,
-                   url_for, send_from_directory,jsonify,g, abort)
+                   url_for, send_from_directory,jsonify,g, abort,Response)
 import core
 from flask_bcrypt import Bcrypt
 import pandas as pd
@@ -216,7 +216,8 @@ def res():
       "Must Have 5"
    ]
 } """
-      
+
+		
 @application.route('/api/rank/scan', methods=['POST'])
 @auth.login_required
 def scan():
@@ -257,7 +258,7 @@ def scan():
                     flask_return = jsoncore.res(search_st,skill_text,jd_exp,min_qual, title,input_json,aws_path,must_have_skill, s3_resource, fs, bucket_name)
                     print(flask_return)
                     finalResult[title]=flask_return
-                    return json.dumps(finalResult,default=lambda o: o.__dict__)
+                    return Response(json.dumps(finalResult,default=lambda o: o.__dict__),status=200,mimetype="application/json")
                 except Exception as e: 
                     print(e)
                     #print(traceback.format_exc())
@@ -283,7 +284,7 @@ def scan():
                     flask_return = jsoncore.res(search_st,skill_text,jd_exp,min_qual, title,input_json,aws_path,must_have_skill, s3_resource, fs, bucket_name)
                     print(flask_return)
                     finalResult[title]=flask_return
-                    return json.dumps(finalResult, separators=(',', ':'))
+                    return Response(json.dumps(finalResult, separators=(',', ':')),status=200,mimetype="application/json")
                 except Exception as e: print(e)    
         #print(finalResult)
         #return json.dumps(finalResult, separators=(',', ':'))

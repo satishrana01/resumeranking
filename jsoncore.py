@@ -42,7 +42,7 @@ exp_weightage = 30
 
 class ResultElement:
     def __init__(self, jd, filename,skillRank, totalExp, phoneNo, email, nonTechSkills,exp,
-                 finalRank,skillList,nonTechskillList,min_qual,is_min_qual,candidateName,isJobTitlePresent):
+                 finalRank,skillList,nonTechskillList,min_qual,is_min_qual,candidateName,isJobTitlePresent,badWords):
         self.jd = jd
         self.filename = filename
         self.skillRank = skillRank
@@ -58,6 +58,7 @@ class ResultElement:
         self.is_min_qual = is_min_qual
         self.candidateName = candidateName
         self.isJobTitlePresent = isJobTitlePresent
+        self.badWords = badWords
     
     def toJSON(self):
         return json.dumps(self, default=lambda o: o.__dict__, 
@@ -90,6 +91,7 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_hav
     Resumes = []
     Temp_pdf = []
     Resume_title = []
+    badWords = []
     jd_weightage = input_json["weightage"]["jd"]
     not_found = 'Not Found'
     extract_exp = ExtractExp()
@@ -241,6 +243,7 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_hav
             vector = vectorizer.transform(text)
             Resume_Vector.append(vector.toarray())
             min_qual_score = skills.minQualificationScore(temptext,min_qual,input_json)
+            badWords.append(skills.word_polarity(temptext))
             min_qual_vector.append(min_qual_score)
             confidence = {}
             score = int((min_qual_score/input_json["weightage"]["minimum_qualification"])*100)
@@ -286,11 +289,11 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_hav
         samples = i
         similarity = cosine_similarity(samples,Job_Desc)[0][0]
         """Ordered_list_Resume_Score.extend(similarity)"""
-        final_rating = round(similarity*jd_weightage,2)+Resume_skill_vector.__getitem__(index)+Resume_nonTechSkills_vector.__getitem__(index)+Resume_exp_vector.__getitem__(index)+min_qual_vector.__getitem__(index)
-        res = ResultElement(round(similarity*jd_weightage,2), os.path.basename(tempList.__getitem__(index)),round(Resume_skill_vector.__getitem__(index),2),
+        final_rating = round(similarity*jd_weightage)+Resume_skill_vector.__getitem__(index)+Resume_nonTechSkills_vector.__getitem__(index)+Resume_exp_vector.__getitem__(index)+min_qual_vector.__getitem__(index)
+        res = ResultElement(round(similarity*jd_weightage), os.path.basename(tempList.__getitem__(index)),round(Resume_skill_vector.__getitem__(index)),
                            Resume_total_exp_vector.__getitem__(index), Resume_phoneNo_vector.__getitem__(index),Resume_email_vector.__getitem__(index),
-                           Resume_nonTechSkills_vector.__getitem__(index),Resume_exp_vector.__getitem__(index),round(final_rating,2),Resume_skill_list.__getitem__(index),
-                           Resume_non_skill_list.__getitem__(index),min_qual_vector.__getitem__(index),is_min_qual.__getitem__(index),Resume_ApplicantName_vector.__getitem__(index),Resume_JobTitleAvailability_vector.__getitem__(index))
+                           Resume_nonTechSkills_vector.__getitem__(index),Resume_exp_vector.__getitem__(index),round(final_rating),Resume_skill_list.__getitem__(index),
+                           Resume_non_skill_list.__getitem__(index),min_qual_vector.__getitem__(index),is_min_qual.__getitem__(index),Resume_ApplicantName_vector.__getitem__(index),Resume_JobTitleAvailability_vector.__getitem__(index),badWords.__getitem__(index))
         flask_return.append(res)
         #print(res.toJSON())
     #flask_return.sort(key=lambda x: x.finalRank, reverse=True)
