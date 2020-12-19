@@ -229,7 +229,6 @@ def scan():
         aws_path = input_json["userInfo"]["name"]+pathSeprator+input_json["jobDetails"]["scan"]
         jd_file_path = bucket_name+pathSeprator+aws_path+pathSeprator+application.config['UPLOAD_JD_FOLDER']
         must_have_skill = input_json["mustHave"]
-        print("JD file path is ",jd_file_path)
         
         for file in fs.glob(jd_file_path+'/*.xlsx'):
             LIST_OF_FILES_TXT_JD.append(file)
@@ -237,17 +236,14 @@ def scan():
             LIST_OF_FILES_XLSX_JD.append(file)
             
         LIST_OF_FILES_JD = LIST_OF_FILES_TXT_JD + LIST_OF_FILES_XLSX_JD
-        print("JD files to be processed ",LIST_OF_FILES_JD) 
         finalResult = {}
         finalResult["userInfo"] = { "companyName":input_json["userInfo"]["companyName"], "name":input_json["userInfo"]["name"], "accountType":input_json["userInfo"]["accountType"], "dateOfScan":now.strftime("%d/%m/%Y %H:%M:%S")}
         for count,i in enumerate(LIST_OF_FILES_JD):
-            print('i is', i)
             Temp = i.rsplit('.',1)
-            print(Temp)
             
             if Temp[-1] == "xlsx" or Temp[-1] == "Xlsx" or Temp[-1] == "XLSX":
                 try:
-                    print('file location is', 's3://{}/{}.xlsx'.format(jd_file_path, i))
+                    print('JD location ', 's3://{}.xlsx'.format(jd_file_path, i))
                     data_set = pd.read_excel("s3://{}".format(i))
                     Ordered_list_jd.append(i)
                     search_st = data_set['High Level Job Description'][0].lower()

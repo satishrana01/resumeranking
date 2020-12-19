@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 #import pythoncom
-import glob
 import os
 import warnings
 import textract
@@ -17,6 +16,8 @@ from extract_exp import ExtractExp
 from striprtf.striprtf import rtf_to_text
 from pathlib import Path
 import json
+import boto3
+from time import gmtime, strftime
 
 
 #os.chdir('Upload-JD')
@@ -95,7 +96,8 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_hav
     jd_weightage = input_json["weightage"]["jd"]
     not_found = 'Not Found'
     extract_exp = ExtractExp()
-    
+    s3 = boto3.resource('s3')
+    root_path='temp/'
     resumePath = bucket_name+pathSeprator+aws_path+pathSeprator+'Upload-Resume'
     
     bucket = s3_resource.Bucket(bucket_name)
@@ -121,10 +123,14 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_hav
 
     LIST_OF_FILES = LIST_OF_FILES_DOC + LIST_OF_FILES_DOCX + LIST_OF_FILES_PDF
     # LIST_OF_FILES.remove("antiword.exe")
-    print("Resume title",Resume_title)
-    print("####### PARSING ########")
+    print("Resume File list",LIST_OF_FILES)
     #pythoncom.CoInitialize()
-    
+    """ here we are creating the directory under temp folder"""
+    sub_dir = aws_path.split(pathSeprator)[0] 
+    final_path = root_path+sub_dir+strftime("%H%M%S", gmtime())
+    if not os.path.exists(final_path):
+        os.makedirs(final_path)
+        
     for count,i in enumerate(LIST_OF_FILES):
        
         Temp = i.rsplit('.',-1)
@@ -179,13 +185,18 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_hav
                 
         elif Temp[1] == "docx" or Temp[1] == "Docx" or Temp[1] == "DOCX":
             try:
-                a = textract.process(i)
+                i = i.replace(bucket_name+pathSeprator, "")
+                head, fileName = os.path.split(i)
+                path_to_read_file = final_path+pathSeprator+fileName
+                s3.Bucket(bucket_name).download_file(i,path_to_read_file)
+                a = textract.process(path_to_read_file)
                 a = a.replace(b'\n',  b' ')
                 a = a.replace(b'\r',  b' ')
                 b = str(a)
                 c = [b]
                 Resumes.extend(c)
                 Ordered_list_Resume.append(i)
+                os.remove(path_to_read_file)
             except Exception as e: print(e)
             
         elif Temp[1] == "txt" or Temp[1] == "Txt" or Temp[1] == "TXT":
@@ -203,9 +214,10 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_hav
         elif Temp[1] == "ex" or Temp[1] == "Exe" or Temp[1] == "EXE":
             print("This is EXE" , i)
             pass
-    print("resume list are {} and {}".format(len(Ordered_list_Resume), Ordered_list_Resume))
-    print("Done Parsing.")
-    print("Please wait we are preparing ranking.")
+    print("final resume list are {} and {}".format(len(Ordered_list_Resume), Ordered_list_Resume),end='\n')
+    print("Cv's Done Parsing.",end='\n')
+    print("Please wait we are preparing ranking.",end='\n')
+    os.rmdir(final_path)
 
     Job_Desc = 0
     
@@ -292,7 +304,7 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_hav
         final_rating = round(similarity*jd_weightage)+Resume_skill_vector.__getitem__(index)+Resume_nonTechSkills_vector.__getitem__(index)+Resume_exp_vector.__getitem__(index)+min_qual_vector.__getitem__(index)
         res = ResultElement(round(similarity*jd_weightage), os.path.basename(tempList.__getitem__(index)),round(Resume_skill_vector.__getitem__(index)),
                            Resume_total_exp_vector.__getitem__(index), Resume_phoneNo_vector.__getitem__(index),Resume_email_vector.__getitem__(index),
-                           Resume_nonTechSkills_vector.__getitem__(index),Resume_exp_vector.__getitem__(index),round(final_rating),Resume_skill_list.__getitem__(index),
+                           round(Resume_nonTechSkills_vector.__getitem__(index)),Resume_exp_vector.__getitem__(index),round(final_rating),Resume_skill_list.__getitem__(index),
                            Resume_non_skill_list.__getitem__(index),min_qual_vector.__getitem__(index),is_min_qual.__getitem__(index),Resume_ApplicantName_vector.__getitem__(index),Resume_JobTitleAvailability_vector.__getitem__(index),badWords.__getitem__(index))
         flask_return.append(res)
         #print(res.toJSON())
