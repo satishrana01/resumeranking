@@ -18,6 +18,7 @@ from pathlib import Path
 import json
 import boto3
 from time import gmtime, strftime
+import shutil
 
 
 #os.chdir('Upload-JD')
@@ -98,6 +99,7 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_hav
     extract_exp = ExtractExp()
     s3 = boto3.resource('s3')
     root_path='temp/'
+    print("temp path >>>>",os.path.abspath(root_path))
     resumePath = bucket_name+pathSeprator+aws_path+pathSeprator+'Upload-Resume'
     
     bucket = s3_resource.Bucket(bucket_name)
@@ -130,6 +132,7 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_hav
     final_path = root_path+sub_dir+strftime("%H%M%S", gmtime())
     if not os.path.exists(final_path):
         os.makedirs(final_path)
+        print("directory created",final_path)
         
     for count,i in enumerate(LIST_OF_FILES):
        
@@ -196,7 +199,10 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_hav
                 c = [b]
                 Resumes.extend(c)
                 Ordered_list_Resume.append(i)
-                os.remove(path_to_read_file)
+                try:
+                    os.remove(path_to_read_file)
+                except:
+                    print ("unable to remove resume file ",path_to_read_file)
             except Exception as e: print(e)
             
         elif Temp[1] == "txt" or Temp[1] == "Txt" or Temp[1] == "TXT":
@@ -217,7 +223,11 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_hav
     print("final resume list are {} and {}".format(len(Ordered_list_Resume), Ordered_list_Resume),end='\n')
     print("Cv's Done Parsing.",end='\n')
     print("Please wait we are preparing ranking.",end='\n')
-    os.rmdir(final_path)
+    #os.rmdir(final_path)
+    try:
+        shutil.rmtree(final_path, ignore_errors=True)
+    except:
+        print("unable to delete directory ",final_path)
 
     Job_Desc = 0
     
@@ -238,7 +248,7 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_hav
     # print("\n\n")
     # print("This is job desc : " , Job_Desc)
     tempList = Ordered_list_Resume 
-    os.chdir('../')
+    #os.chdir('../')
     flask_return = []
     for index,i in enumerate(Resumes):
 
