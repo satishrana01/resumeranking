@@ -29,25 +29,17 @@ def programmingScore(resume, jdTxt,input_json):
         if jdSkillMatched[i].lower() in resume.lower() != -1:
             programmingTotal += 1
             ResumeProgrammingSkillsMatchedWithJD.append(jdSkillMatched[i].lower())
-    resumeCorpus = resume.split()
-    resumeCorpus = [x.lower() for x in resumeCorpus if isinstance(x, str)]
-    jdSkillMatched = [x.lower() for x in jdSkillMatched if isinstance(x, str)]
+    
     list1 = []
+    
     for item in ResumeProgrammingSkillsMatchedWithJD:
         list1.append(remove_punctuations(item))
-    list2 = []
-    for item in resumeCorpus:
-        list2.append(remove_punctuations(item))
+    
     results = {}
     for i in list1:
-        if list2.count(i) > skill_threshold:
-            results[i] = skill_threshold
-        else:
-            results[i] = list2.count(i)
-        
+        results[i] = 1
     
-    constantValue = (individualSkillWeightage/skill_threshold)
-    results.update({n: constantValue * results[n] for n in results.keys()})
+    results.update({n: individualSkillWeightage * results[n] for n in results.keys()})
     TotalScore = sum(results.values())
     
     return TotalScore
@@ -108,61 +100,71 @@ def minQualificationScore(resume, jdTxt,input_json):
     
     return TotalScore
 
-def skillSetListMatchedWithJD(resume, jdTxt):
+def skillSetListMatchedWithJD(resume, jdTxt,rank):
    
     programming = []
     programming = loadSkillSetDB(rootpath+pathSeprator+'skillDB.txt')
-    jdSkillCount = 0
     jdSkillMatched = []
     skillMatched = []
-    results = {}
+    skillNotMatched = []
+    finalResult ={}
+
     for i in range(len(programming)):
         if programming[i].lower() in jdTxt.lower() != -1:
-            jdSkillCount += 1
             jdSkillMatched.append(programming[i].lower())
+        
     
     jdSkillMatched = list(set(jdSkillMatched))
     
     for i in range(len(jdSkillMatched)):
         if jdSkillMatched[i].lower() in resume.lower() != -1:
             skillMatched.append(jdSkillMatched[i].lower())
-            
+        else:
+            skillNotMatched.append(jdSkillMatched[i].lower())
 
-    #print(skillMatched)
     skillMatched = list(set(skillMatched))
-    resumeCorpus = resume.split()
-    resumeCorpus = [x.lower() for x in resumeCorpus if isinstance(x, str)]
+    skillNotMatched = list(set(skillNotMatched))
+
     list1 = []
+    list2 = []
     for item in skillMatched:
         list1.append(remove_punctuations(item))
-    list2 = []
-    for item in resumeCorpus:
-        list2.append(remove_punctuations(item))
-    results = {}
-    for i in list1:
-        results[i] = list2.count(i)
-    
-    return results
+        
+    for item in skillNotMatched:
+        list2.append(remove_punctuations(item))    
 
-def nonTechSkillSetListMatchedWithJD(resume, jdTxt):
+    finalResult['rank'] = round(rank)    
+    finalResult['skillMatch'] = list1
+    finalResult['skillUnMatch'] = list2
+ 
+    return finalResult
+
+def nonTechSkillSetListMatchedWithJD(resume, jdTxt,rank):
    
     programming = []
     programming = loadSkillSetDB(rootpath+pathSeprator+"nonSkillDB.txt")
-    jdSkillCount = 0
     jdSkillMatched = []
     skillMatched = []
+    skillUnMatched = []
+    finalResult = {}
     for i in range(len(programming)):
         if programming[i].lower() in jdTxt.lower() != -1:
-            jdSkillCount += 1
             jdSkillMatched.append(programming[i].lower())
     
     for i in range(len(jdSkillMatched)):
         if jdSkillMatched[i].lower() in resume.lower() != -1:
             skillMatched.append(jdSkillMatched[i].lower())
+        else:
+            skillUnMatched.append(jdSkillMatched[i].lower())
 
-    #print(skillMatched)
     skillMatched = list(set(skillMatched))
-    return skillMatched
+    skillUnMatched = list(set(skillUnMatched))
+    
+    finalResult['rank'] = round(rank)    
+    finalResult['skillMatch'] = skillMatched
+    finalResult['skillUnMatch'] = skillUnMatched
+    
+    return finalResult
 
 
 def loadSkillSetDB(fileName):
@@ -182,43 +184,32 @@ def remove_punctuations(text):
 def NonTechnicalSkillScore(resume, jd_txt,input_json):
     
     NonTechnicalSkill = loadSkillSetDB(rootpath+pathSeprator+"nonSkillDB.txt")
-    programmingTotal = 0
-    jdSkillCount = 0
     non_tech_weightage = input_json["weightage"]["soft_skill"]
+    if non_tech_weightage == 0:
+        non_tech_weightage = 1
+        
     jdSkillMatched = []
     for i in range(len(NonTechnicalSkill)):
         if NonTechnicalSkill[i].lower() in jd_txt.lower() != -1:
-            jdSkillCount += 1
             jdSkillMatched.append(NonTechnicalSkill[i].lower())
-    if (jdSkillCount > 0):
-        individualSkillWeightage = non_tech_weightage/jdSkillCount
+    
+    jdSkillMatched = list(set(jdSkillMatched))
+    
+    if (len(jdSkillMatched) > 0):
+        individualSkillWeightage = non_tech_weightage/len(jdSkillMatched)
     else :
         individualSkillWeightage = 0
 
     ResumeProgrammingSkillsMatchedWithJD = []
     for i in range(len(jdSkillMatched)):
         if jdSkillMatched[i].lower() in resume.lower() != -1:
-            programmingTotal += 1
             ResumeProgrammingSkillsMatchedWithJD.append(jdSkillMatched[i].lower())
             
-              
-    resumeCorpus = resume.split()
-    """ Modify below """
-    resumeCorpus = resumeCorpus + ResumeProgrammingSkillsMatchedWithJD
-    resumeCorpus = [x.lower() for x in resumeCorpus if isinstance(x, str)]
-    jdSkillMatched = [x.lower() for x in jdSkillMatched if isinstance(x, str)]
-    list1 = jdSkillMatched
-    list2 = resumeCorpus
     results = {}
-    for i in list1:
-        if list2.count(i) > skill_threshold:
-           results[i] = skill_threshold
-        else:
-           results[i] = list2.count(i)
-		
-    
-    constantValue = (individualSkillWeightage/skill_threshold)
-    results.update({n: constantValue * results[n] for n in results.keys()})
+    for i in ResumeProgrammingSkillsMatchedWithJD:
+        results[i] = 1
+ 		
+    results.update({n: individualSkillWeightage * results[n] for n in results.keys()})
     TotalScore = sum(results.values())
     
     return TotalScore

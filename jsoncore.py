@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 
-#import pythoncom
 import os
 import warnings
 import textract
-#from win32com.client import Dispatch
 import traceback
 import extractEntities as entity
 from gensim.summarization import summarize
@@ -19,14 +17,6 @@ import json
 import boto3
 from time import gmtime, strftime
 import shutil
-
-
-#os.chdir('Upload-JD')
-#ffile = glob.glob('*.xlsx', recursive=False)
-#job_data_set = pd.read_excel(ffile[0])
-#job_title = job_data_set['Job Title'][0]
-#print("Job title is {}".format(job_title))
-#os.chdir('..')
 
 warnings.filterwarnings(action='ignore', category=UserWarning, module='gensim')
 
@@ -43,19 +33,17 @@ exp_weightage = 30
 
 
 class ResultElement:
-    def __init__(self, jd, filename,skillRank, totalExp, phoneNo, email, nonTechSkills,exp,
-                 finalRank,skillList,nonTechskillList,min_qual,is_min_qual,candidateName,isJobTitlePresent,badWords):
+    def __init__(self, jd, filename,totalExp, phoneNo, email, exp,
+                 finalRank,skills,nonTechskillList,min_qual,is_min_qual,candidateName,isJobTitlePresent,badWords):
         self.jd = jd
         self.filename = filename
-        self.skillRank = skillRank
         self.totalExp = totalExp
         self.phoneNo = phoneNo
         self.email = email
-        self.nonTechSkills = nonTechSkills
         self.exp = exp
         self.finalRank = finalRank
-        self.skillList = skillList
-        self.nonTechskillList = nonTechskillList
+        self.primarySkills = skills
+        self.softSkills = nonTechskillList
         self.min_qual =  min_qual
         self.is_min_qual = is_min_qual
         self.candidateName = candidateName
@@ -99,7 +87,6 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_hav
     extract_exp = ExtractExp()
     s3 = boto3.resource('s3')
     root_path='temp/'
-    print("temp path >>>>",os.path.abspath(root_path))
     resumePath = bucket_name+pathSeprator+aws_path+pathSeprator+'Upload-Resume'
     
     bucket = s3_resource.Bucket(bucket_name)
@@ -245,10 +232,7 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_hav
     vector = vectorizer.transform(text)
 
     Job_Desc = vector.toarray()
-    # print("\n\n")
-    # print("This is job desc : " , Job_Desc)
     tempList = Ordered_list_Resume 
-    #os.chdir('../')
     flask_return = []
     for index,i in enumerate(Resumes):
 
@@ -277,9 +261,9 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_hav
             else:
                 confidence['min qual'] = 'No'
             is_min_qual.append(confidence)
-            Resume_skill_vector.append(skills.programmingScore(temptext,jobfile+skillset,input_json))
-            Resume_skill_list.append(skills.skillSetListMatchedWithJD(temptext,jobfile+skillset))
-            Resume_non_skill_list.append(skills.nonTechSkillSetListMatchedWithJD(temptext,jobfile+skillset))
+            skill_rank = skills.programmingScore(temptext,jobfile+skillset,input_json)
+            Resume_skill_vector.append(skill_rank)
+            Resume_skill_list.append(skills.skillSetListMatchedWithJD(temptext,jobfile+skillset,skill_rank))
             experience = extract_exp.get_features(temptext)
             Resume_total_exp_vector.append(experience)
             temp_applicantName = entity.extractPersonName(temptext, str(Ordered_list_Resume.__getitem__(index)))
@@ -299,7 +283,10 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_hav
                 
            
             Resume_exp_vector.append(extract_exp.get_exp_weightage(str(jd_exp),experience))
-            Resume_nonTechSkills_vector.append(skills.NonTechnicalSkillScore(temptext,jobfile+skillset,input_json))
+            non_tech_Score = skills.NonTechnicalSkillScore(temptext,jobfile+skillset,input_json)
+            Resume_nonTechSkills_vector.append(non_tech_Score)
+            Resume_non_skill_list.append(skills.nonTechSkillSetListMatchedWithJD(temptext,jobfile+skillset,non_tech_Score))
+            
             print("Rank prepared for ",Ordered_list_Resume.__getitem__(index))
         except Exception:
             print(traceback.format_exc())
@@ -312,9 +299,9 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_hav
         similarity = cosine_similarity(samples,Job_Desc)[0][0]
         """Ordered_list_Resume_Score.extend(similarity)"""
         final_rating = round(similarity*jd_weightage)+Resume_skill_vector.__getitem__(index)+Resume_nonTechSkills_vector.__getitem__(index)+Resume_exp_vector.__getitem__(index)+min_qual_vector.__getitem__(index)
-        res = ResultElement(round(similarity*jd_weightage), os.path.basename(tempList.__getitem__(index)),round(Resume_skill_vector.__getitem__(index)),
+        res = ResultElement(round(similarity*jd_weightage), os.path.basename(tempList.__getitem__(index)),
                            Resume_total_exp_vector.__getitem__(index), Resume_phoneNo_vector.__getitem__(index),Resume_email_vector.__getitem__(index),
-                           round(Resume_nonTechSkills_vector.__getitem__(index)),Resume_exp_vector.__getitem__(index),round(final_rating),Resume_skill_list.__getitem__(index),
+                           Resume_exp_vector.__getitem__(index),round(final_rating),Resume_skill_list.__getitem__(index),
                            Resume_non_skill_list.__getitem__(index),min_qual_vector.__getitem__(index),is_min_qual.__getitem__(index),Resume_ApplicantName_vector.__getitem__(index),Resume_JobTitleAvailability_vector.__getitem__(index),badWords.__getitem__(index))
         flask_return.append(res)
         #print(res.toJSON())
