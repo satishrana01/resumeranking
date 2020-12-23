@@ -82,6 +82,8 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_hav
     Temp_pdf = []
     Resume_title = []
     badWords = []
+    JD_rank_vector = []
+    jd_rank_keyword = []
     jd_weightage = input_json["weightage"]["jd"]
     not_found = 'Not Found'
     extract_exp = ExtractExp()
@@ -220,6 +222,7 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_hav
     
     try:
         tttt = str(jobfile)
+        JDText = tttt
         tttt = summarize(tttt, word_count=100)
         text = [tttt]
     except:
@@ -249,6 +252,9 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_hav
             vector = vectorizer.transform(text)
             Resume_Vector.append(vector.toarray())
             min_qual_score = skills.minQualificationScore(temptext,min_qual,input_json)
+            jd_rankDict = skills.JDkeywordMatch(jobfile+skillset, temptext, jd_weightage)
+            JD_rank_vector.append(jd_rankDict.get('rank'))
+            jd_rank_keyword.append(jd_rankDict)
             badWords.append(skills.word_polarity(temptext))
             min_qual_vector.append(min_qual_score)
             confidence = {}
@@ -296,10 +302,10 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_hav
     for index,i in enumerate(Resume_Vector):
 
         samples = i
-        similarity = cosine_similarity(samples,Job_Desc)[0][0]
+        #similarity = cosine_similarity(samples,Job_Desc)[0][0]
         """Ordered_list_Resume_Score.extend(similarity)"""
-        final_rating = round(similarity*jd_weightage)+Resume_skill_vector.__getitem__(index)+Resume_nonTechSkills_vector.__getitem__(index)+Resume_exp_vector.__getitem__(index)+min_qual_vector.__getitem__(index)
-        res = ResultElement(round(similarity*jd_weightage), os.path.basename(tempList.__getitem__(index)),
+        final_rating = JD_rank_vector.__getitem__(index)+Resume_skill_vector.__getitem__(index)+Resume_nonTechSkills_vector.__getitem__(index)+Resume_exp_vector.__getitem__(index)+min_qual_vector.__getitem__(index)
+        res = ResultElement(jd_rank_keyword.__getitem__(index), os.path.basename(tempList.__getitem__(index)),
                            Resume_total_exp_vector.__getitem__(index), Resume_phoneNo_vector.__getitem__(index),Resume_email_vector.__getitem__(index),
                            Resume_exp_vector.__getitem__(index),round(final_rating),Resume_skill_list.__getitem__(index),
                            Resume_non_skill_list.__getitem__(index),min_qual_vector.__getitem__(index),is_min_qual.__getitem__(index),Resume_ApplicantName_vector.__getitem__(index),Resume_JobTitleAvailability_vector.__getitem__(index),badWords.__getitem__(index))
