@@ -226,6 +226,7 @@ def scan():
         #os.chdir(app.config['UPLOAD_JD_FOLDER'])
         now = datetime.now()
         input_json = request.get_json()
+        print("input request",input_json)
         aws_path = input_json["userInfo"]["name"]+pathSeprator+input_json["jobDetails"]["scan"]
         jd_file_path = bucket_name+pathSeprator+aws_path+pathSeprator+application.config['UPLOAD_JD_FOLDER']
         must_have_skill = input_json["mustHave"]
@@ -252,9 +253,10 @@ def scan():
                     title = data_set['Job Title'][0].lower()
                     min_qual = data_set['Minimum Qualification'][0].lower()
                     flask_return = jsoncore.res(search_st,skill_text,jd_exp,min_qual, title,input_json,aws_path,must_have_skill, s3_resource, fs, bucket_name)
-                    print(flask_return)
                     finalResult[title]=flask_return
-                    return Response(json.dumps(finalResult,default=lambda o: o.__dict__),status=200,mimetype="application/json")
+                    final_json = json.dumps(finalResult,default=lambda o: o.__dict__)
+                    print("Output response ",final_json)
+                    return Response(final_json,status=200,mimetype="application/json")
                 except Exception as e: 
                     print(e)
                     #print(traceback.format_exc())
@@ -278,9 +280,10 @@ def scan():
                     title = jd_text_data[0][0:20] # Getting substring with initial 20 chars
                     min_qual = ""
                     flask_return = jsoncore.res(search_st,skill_text,jd_exp,min_qual, title,input_json,aws_path,must_have_skill, s3_resource, fs, bucket_name)
-                    print(flask_return)
                     finalResult[title]=flask_return
-                    return Response(json.dumps(finalResult, separators=(',', ':')),status=200,mimetype="application/json")
+                    final_json = json.dumps(finalResult,default=lambda o: o.__dict__)
+                    print("Output response ",final_json)
+                    return Response(final_json,status=200,mimetype="application/json")
                 except Exception as e: print(e)    
         #print(finalResult)
         #return json.dumps(finalResult, separators=(',', ':'))

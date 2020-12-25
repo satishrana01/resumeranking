@@ -305,7 +305,7 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_hav
         #similarity = cosine_similarity(samples,Job_Desc)[0][0]
         """Ordered_list_Resume_Score.extend(similarity)"""
         final_rating = JD_rank_vector.__getitem__(index)+Resume_skill_vector.__getitem__(index)+Resume_nonTechSkills_vector.__getitem__(index)+Resume_exp_vector.__getitem__(index)+min_qual_vector.__getitem__(index)
-        res = ResultElement(jd_rank_keyword.__getitem__(index), os.path.basename(tempList.__getitem__(index)),
+        res = ResultElement(jd_rank_keyword.__getitem__(index),tempList.__getitem__(index),
                            Resume_total_exp_vector.__getitem__(index), Resume_phoneNo_vector.__getitem__(index),Resume_email_vector.__getitem__(index),
                            Resume_exp_vector.__getitem__(index),round(final_rating),Resume_skill_list.__getitem__(index),
                            Resume_non_skill_list.__getitem__(index),min_qual_vector.__getitem__(index),is_min_qual.__getitem__(index),Resume_ApplicantName_vector.__getitem__(index),Resume_JobTitleAvailability_vector.__getitem__(index),badWords.__getitem__(index))

@@ -169,10 +169,6 @@ def JDkeywordMatch(JDText, ResumeText, Weightage):
        if word in JD_Keyword_Matched:
            ResumeJD_Matched.append(word)
 
-    print(JD_Keyword_Matched)
-    print(Resume_Keyword_Matched)
-    print("matches are ", ResumeJD_Matched)
-    print("misses are ", ResumJD_Missed)
     finalResult = {}
     JD_freq = {} 
     Resume_freq = {}
@@ -190,18 +186,10 @@ def JDkeywordMatch(JDText, ResumeText, Weightage):
 
     JD_freq = collections.OrderedDict(sorted(JD_freq.items()))   
     Resume_freq = collections.OrderedDict(sorted(Resume_freq.items()))
-
-    print("JD Freq dict is ", JD_freq)
-    print("Resume Freq Dict is ",Resume_freq)
-
     # Rank logic
     percent_EachJDKeywords = round(Weightage/len(JD_freq))
-    print("percent assigned to each jd keyword is ", percent_EachJDKeywords)
-
     main_JD_keys = list(set(JD_Keyword_Matched))
-    print("main keys found in JD are ", main_JD_keys)
     perc_Dict = dict((k,percent_EachJDKeywords) for k in main_JD_keys)
-    print("Percentage distributed across all JD keywords are ",perc_Dict)
 
     # Ranking
     rank_dict = {}
@@ -217,12 +205,9 @@ def JDkeywordMatch(JDText, ResumeText, Weightage):
         else:
             rank_dict[key] = 0
 
-    print("Rank dict is ", rank_dict)
-
     for k,v in rank_dict.items():
        FinalPercentage = FinalPercentage + v
 
-    print("Final percentage is ", FinalPercentage)
     finalResult['rank'] = FinalPercentage
     finalResult['jdKeywordMatch'] = JD_freq
     finalResult['jdKeywordUnMatched'] = ResumJD_Missed
@@ -305,6 +290,10 @@ def NonTechnicalSkillScore(resume, jd_txt,input_json):
     return TotalScore
 
 def dndResume(resumeText,must_have_skill):
+    
+    if(len(must_have_skill) == 0):
+        return False
+    
     for skill in must_have_skill:
         if skill.lower() in resumeText:
             return False
