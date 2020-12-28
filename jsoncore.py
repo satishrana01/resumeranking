@@ -114,26 +114,33 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_hav
 
     LIST_OF_FILES = LIST_OF_FILES_DOC + LIST_OF_FILES_DOCX + LIST_OF_FILES_PDF
     # LIST_OF_FILES.remove("antiword.exe")
-    print("Resume File list",LIST_OF_FILES)
+    print("Resume File list size ",len(LIST_OF_FILES))
     #pythoncom.CoInitialize()
     """ here we are creating the directory under temp folder"""
-    sub_dir = aws_path.split(pathSeprator)[0] 
+    sub_dir = aws_path.split(pathSeprator)[0]
     final_path = root_path+sub_dir+strftime("%H%M%S", gmtime())
     if not os.path.exists(final_path):
         os.makedirs(final_path)
         print("directory created",final_path)
-        
+    
+    #download all files to local system
     for count,i in enumerate(LIST_OF_FILES):
+        i = i.replace(bucket_name+pathSeprator, "")
+        head, fileName = os.path.split(i)
+        path_to_read_file = final_path+pathSeprator+fileName
+        s3.Bucket(bucket_name).download_file(i,path_to_read_file)
+ 
+    for count,j in enumerate(LIST_OF_FILES):
        
+        temp_path = j.rsplit('/',1)
+        i = final_path+pathSeprator+temp_path[1]
         Temp = i.rsplit('.',-1)
-        #rr= Temp[0].rsplit('/',1)
         
-        #Resume_title.append(rr[-1])
         if Temp[1] == "pdf" or Temp[1] == "Pdf" or Temp[1] == "PDF":
             try:
-                with fs.open(i,'rb') as pdf_file:
+                 with open(i,'rb') as pdf_file:
                     
-                    read_pdf = PyPDF2.PdfFileReader(pdf_file)
+                    read_pdf = PyPDF2.PdfFileReader(pdf_file,strict=False)
                     # page = read_pdf.getPage(0)
                     # page_content = page.extractText()
                     # Resumes.append(Temp_pdf)
@@ -157,11 +164,6 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_hav
             except Exception as e: 
                 print(e)
                 print(traceback.format_exc())
-        elif Temp[1] == "doc" or Temp[1] == "Doc" or Temp[1] == "DOC":
-            print(count," This is DOC" , i)
-                
-            #parse_docfile(i)
-         
         elif Temp[1] == "rtf" or Temp[1] == "Rtf" or Temp[1] == "RTF":
                 
             try:
@@ -177,26 +179,23 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_hav
                 
         elif Temp[1] == "docx" or Temp[1] == "Docx" or Temp[1] == "DOCX":
             try:
-                i = i.replace(bucket_name+pathSeprator, "")
-                head, fileName = os.path.split(i)
-                path_to_read_file = final_path+pathSeprator+fileName
-                s3.Bucket(bucket_name).download_file(i,path_to_read_file)
-                a = textract.process(path_to_read_file)
+                a = textract.process(i)
                 a = a.replace(b'\n',  b' ')
                 a = a.replace(b'\r',  b' ')
                 b = str(a)
                 c = [b]
                 Resumes.extend(c)
                 Ordered_list_Resume.append(i)
-                try:
+                """try:
                     os.remove(path_to_read_file)
                 except:
                     print ("unable to remove resume file ",path_to_read_file)
+               """     
             except Exception as e: print(e)
             
         elif Temp[1] == "txt" or Temp[1] == "Txt" or Temp[1] == "TXT":
             try:
-                f = fs.open(i,'r')
+                f = open(i,'r')
                 lines = f.readlines()
                 a =  "\n".join(lines)
                 c = [str(a)]
@@ -209,10 +208,9 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_hav
         elif Temp[1] == "ex" or Temp[1] == "Exe" or Temp[1] == "EXE":
             print("This is EXE" , i)
             pass
-    print("final resume list are {} and {}".format(len(Ordered_list_Resume), Ordered_list_Resume),end='\n')
+    print("final resume list are {}".format(len(Ordered_list_Resume)),end='\n')
     print("Cv's Done Parsing.",end='\n')
     print("Please wait we are preparing ranking.",end='\n')
-    #os.rmdir(final_path)
     try:
         shutil.rmtree(final_path, ignore_errors=True)
     except:
@@ -237,6 +235,7 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_hav
     Job_Desc = vector.toarray()
     tempList = Ordered_list_Resume 
     flask_return = []
+    print("Final list of resume",len(Ordered_list_Resume))
     for index,i in enumerate(Resumes):
 
         text = i
@@ -247,7 +246,10 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_hav
         try:
             if(skills.dndResume(temptext,must_have_skill)):
                 continue
-            tttt = summarize(tttt, word_count=100) 
+            try:
+                tttt = summarize(tttt, word_count=100)
+            except Exception:
+                continue
             text = [tttt]
             vector = vectorizer.transform(text)
             Resume_Vector.append(vector.toarray())
@@ -293,7 +295,8 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_hav
             Resume_nonTechSkills_vector.append(non_tech_Score)
             Resume_non_skill_list.append(skills.nonTechSkillSetListMatchedWithJD(temptext,jobfile+skillset,non_tech_Score))
             
-            print("Rank prepared for ",Ordered_list_Resume.__getitem__(index))
+            print("{} Rank prepared for {} ".format(index,Ordered_list_Resume.__getitem__(index)))
+       
         except Exception:
             print(traceback.format_exc())
             tempList.__delitem__(index)
@@ -301,11 +304,11 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_hav
    # Resume_JobTitleAvailability_vector.__getitem__(index)
     for index,i in enumerate(Resume_Vector):
 
-        samples = i
+        file_path = resumePath+pathSeprator+tempList.__getitem__(index).rsplit('/',1)[1]
         #similarity = cosine_similarity(samples,Job_Desc)[0][0]
         """Ordered_list_Resume_Score.extend(similarity)"""
         final_rating = JD_rank_vector.__getitem__(index)+Resume_skill_vector.__getitem__(index)+Resume_nonTechSkills_vector.__getitem__(index)+Resume_exp_vector.__getitem__(index)+min_qual_vector.__getitem__(index)
-        res = ResultElement(jd_rank_keyword.__getitem__(index),tempList.__getitem__(index),
+        res = ResultElement(jd_rank_keyword.__getitem__(index),file_path,
                            Resume_total_exp_vector.__getitem__(index), Resume_phoneNo_vector.__getitem__(index),Resume_email_vector.__getitem__(index),
                            Resume_exp_vector.__getitem__(index),round(final_rating),Resume_skill_list.__getitem__(index),
                            Resume_non_skill_list.__getitem__(index),min_qual_vector.__getitem__(index),is_min_qual.__getitem__(index),Resume_ApplicantName_vector.__getitem__(index),Resume_JobTitleAvailability_vector.__getitem__(index),badWords.__getitem__(index))
