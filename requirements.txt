@@ -82,3 +82,4 @@ zipp==3.2.0
 s3fs==0.5.1
 textblob==0.15.3
 python-docx==0.8.10
+dask==2020.12.0

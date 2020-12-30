@@ -18,6 +18,13 @@ import boto3
 from time import gmtime, strftime
 import shutil
 
+from functools import partial
+import dask
+from dask.diagnostics import ProgressBar
+import numpy as np
+import threading
+
+
 warnings.filterwarnings(action='ignore', category=UserWarning, module='gensim')
 
 global rootpath
@@ -26,11 +33,6 @@ bucket_name = 'resume-rank-bucket'
 rootpath = "resume-rank-bucket"
 global pathSeprator
 pathSeprator = '/'
-global skill_threshold
-skill_threshold = 5
-global exp_weightage
-exp_weightage = 30
-
 
 class ResultElement:
     def __init__(self, jd, filename,totalExp, phoneNo, email, exp,
@@ -58,20 +60,21 @@ def getfilepath(loc):
     temp = str(loc)
     temp = temp.replace('\\', '/')
     return temp
-   
+
+def _s3_download(s3,bucket_name,path_to_read_file,i):
+    try:
+        s3.Bucket(bucket_name).download_file(i,path_to_read_file)
+        
+    except Exception as e:
+        print(e)
+
 def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_have_skill, s3_resource, fs, bucket_name):
-    Resume_Vector = []
-    Resume_skill_vector = []
-    min_qual_vector = []
     is_min_qual = []
     Resume_skill_list = []
     Resume_non_skill_list = []
     Resume_email_vector = []
-    Resume_JobTitleAvailability_vector = []
     Resume_phoneNo_vector = []
-    Resume_ApplicantName_vector = []
     Resume_total_exp_vector = []
-    Resume_nonTechSkills_vector = []
     Resume_exp_vector = []
     Ordered_list_Resume = []
     LIST_OF_FILES = []
@@ -80,24 +83,24 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_hav
     LIST_OF_FILES_DOCX = []
     Resumes = []
     Temp_pdf = []
-    Resume_title = []
     badWords = []
     JD_rank_vector = []
     jd_rank_keyword = []
+    
     jd_weightage = input_json["weightage"]["jd"]
+    skill_weightage = input_json["weightage"]["skill"]
+    min_qual_weightage = input_json["weightage"]["minimum_qualification"]
+    non_tech_weightage = input_json["weightage"]["soft_skill"]
+    
+    exp_weightage = 0
+    if (str(input_json["weightage"]["experience"]["required"]).lower() == 'true'):
+        exp_weightage = input_json["weightage"]["experience"]["allocation"]
+    
     not_found = 'Not Found'
     extract_exp = ExtractExp()
     s3 = boto3.resource('s3')
     root_path='temp/'
     resumePath = bucket_name+pathSeprator+aws_path+pathSeprator+'Upload-Resume'
-    
-    bucket = s3_resource.Bucket(bucket_name)
-    for obj in bucket.objects.all():
-        if '{}/'.format(resumePath) in obj.key:
-            #print(obj.key)
-            Temp = obj.key.split('/',-1)
-            #print(Temp)
-            Resume_title = Resume_title + [Temp[-1]]
         
     #print('length of resume list is ', len(resume_name_inS3))
     
@@ -124,11 +127,17 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_hav
         print("directory created",final_path)
     
     #download all files to local system
+    dask.config.set(scheduler='threads', num_workers=20)
+    _download = partial(_s3_download, s3,bucket_name)
+    delayed_futures = []    
     for count,i in enumerate(LIST_OF_FILES):
         i = i.replace(bucket_name+pathSeprator, "")
         head, fileName = os.path.split(i)
         path_to_read_file = final_path+pathSeprator+fileName
-        s3.Bucket(bucket_name).download_file(i,path_to_read_file)
+        """_s3_download(s3,bucket_name,i,path_to_read_file)"""
+        delayed_futures.append(dask.delayed(_download)(path_to_read_file,i))
+    with ProgressBar():
+        dask.compute(*delayed_futures)    
  
     for count,j in enumerate(LIST_OF_FILES):
        
@@ -209,37 +218,19 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_hav
             print("This is EXE" , i)
             pass
     print("final resume list are {}".format(len(Ordered_list_Resume)),end='\n')
-    print("Cv's Done Parsing.",end='\n')
-    print("Please wait we are preparing ranking.",end='\n')
     try:
         shutil.rmtree(final_path, ignore_errors=True)
     except:
         print("unable to delete directory ",final_path)
 
-    Job_Desc = 0
-    
-    try:
-        tttt = str(jobfile)
-        JDText = tttt
-        tttt = summarize(tttt, word_count=100)
-        text = [tttt]
-    except:
-        text = 'None'
-
-    
-    vectorizer = TfidfVectorizer(stop_words='english')
-    # print(text)
-    vectorizer.fit(text)
-    vector = vectorizer.transform(text)
-
-    Job_Desc = vector.toarray()
-    tempList = Ordered_list_Resume 
     flask_return = []
     print("Final list of resume",len(Ordered_list_Resume))
+ 
     for index,i in enumerate(Resumes):
 
         text = i
         temptext = str(text).lower()
+        
         tttt = str(text).lower()
        
         
@@ -251,16 +242,15 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_hav
             except Exception:
                 continue
             text = [tttt]
-            vector = vectorizer.transform(text)
-            Resume_Vector.append(vector.toarray())
-            min_qual_score = skills.minQualificationScore(temptext,min_qual,input_json)
             jd_rankDict = skills.JDkeywordMatch(jobfile+skillset, temptext, jd_weightage)
             JD_rank_vector.append(jd_rankDict.get('rank'))
             jd_rank_keyword.append(jd_rankDict)
-            badWords.append(skills.word_polarity(temptext))
-            min_qual_vector.append(min_qual_score)
+            
+            badWords = skills.word_polarity(temptext)
+            
+            min_qual_score = skills.minQualificationScore(temptext,min_qual,min_qual_weightage)
             confidence = {}
-            score = int((min_qual_score/input_json["weightage"]["minimum_qualification"])*100)
+            score = int((min_qual_score/min_qual_weightage)*100)
             confidence['confidence'] = score
             if score >= 60:
                 confidence['min qual'] = 'Yes'
@@ -268,53 +258,50 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_hav
                 confidence['min qual'] = 'May Be'
             else:
                 confidence['min qual'] = 'No'
-            is_min_qual.append(confidence)
-            skill_rank = skills.programmingScore(temptext,jobfile+skillset,input_json)
-            Resume_skill_vector.append(skill_rank)
-            Resume_skill_list.append(skills.skillSetListMatchedWithJD(temptext,jobfile+skillset,skill_rank))
+            is_min_qual = confidence
+            
+            
+            skill_rank = skills.programmingScore(temptext,jobfile+skillset,skill_weightage)
+            Resume_skill_list = skills.skillSetListMatchedWithJD(temptext,jobfile+skillset,skill_rank)
+            
+            
             experience = extract_exp.get_features(temptext)
             Resume_total_exp_vector.append(experience)
+            
             temp_applicantName = entity.extractPersonName(temptext, str(Ordered_list_Resume.__getitem__(index)))
-            Resume_ApplicantName_vector.append(temp_applicantName)
+                        
             bool_jobTitleFound = entity.isJobTitleAvailable(job_title, temptext)
-            Resume_JobTitleAvailability_vector.append(bool_jobTitleFound)
+                       
             temp_phone = entity.extract_phone_numbers(temptext)
             if(len(temp_phone) == 0):
-                Resume_phoneNo_vector.append(not_found)
+                Resume_phoneNo_vector = not_found
             else:
-                 Resume_phoneNo_vector.append(temp_phone)
+                 Resume_phoneNo_vector = temp_phone
             temp_email = entity.extract_email_addresses(temptext)
             if(len(temp_email) == 0):
-                Resume_email_vector.append(not_found)
+                Resume_email_vector = not_found
             else:
-                 Resume_email_vector.append(temp_email)
+                 Resume_email_vector = temp_email
                 
            
-            Resume_exp_vector.append(extract_exp.get_exp_weightage(str(jd_exp),experience))
-            non_tech_Score = skills.NonTechnicalSkillScore(temptext,jobfile+skillset,input_json)
-            Resume_nonTechSkills_vector.append(non_tech_Score)
-            Resume_non_skill_list.append(skills.nonTechSkillSetListMatchedWithJD(temptext,jobfile+skillset,non_tech_Score))
+            Resume_exp_vector = extract_exp.get_exp_weightage(str(jd_exp),experience,exp_weightage)
+            
+            non_tech_Score = skills.NonTechnicalSkillScore(temptext,jobfile+skillset,non_tech_weightage)
+            Resume_non_skill_list = skills.nonTechSkillSetListMatchedWithJD(temptext,jobfile+skillset,non_tech_Score)
             
             print("{} Rank prepared for {} ".format(index,Ordered_list_Resume.__getitem__(index)))
+            
+            file_path = resumePath+pathSeprator+Ordered_list_Resume.__getitem__(index).rsplit('/',1)[1]
+            
+            final_rating = jd_rankDict.get('rank')+skill_rank+non_tech_Score+extract_exp.get_exp_weightage(str(jd_exp),experience,exp_weightage)+min_qual_score
+           
+            res = ResultElement(jd_rankDict,file_path,experience,Resume_phoneNo_vector,Resume_email_vector,
+                           Resume_exp_vector,round(final_rating),Resume_skill_list,
+                           Resume_non_skill_list,min_qual_score,is_min_qual,temp_applicantName,bool_jobTitleFound,badWords)
+            flask_return.append(res)
        
         except Exception:
             print(traceback.format_exc())
-            tempList.__delitem__(index)
+           
             
-   # Resume_JobTitleAvailability_vector.__getitem__(index)
-    for index,i in enumerate(Resume_Vector):
-
-        file_path = resumePath+pathSeprator+tempList.__getitem__(index).rsplit('/',1)[1]
-        #similarity = cosine_similarity(samples,Job_Desc)[0][0]
-        """Ordered_list_Resume_Score.extend(similarity)"""
-        final_rating = JD_rank_vector.__getitem__(index)+Resume_skill_vector.__getitem__(index)+Resume_nonTechSkills_vector.__getitem__(index)+Resume_exp_vector.__getitem__(index)+min_qual_vector.__getitem__(index)
-        res = ResultElement(jd_rank_keyword.__getitem__(index),file_path,
-                           Resume_total_exp_vector.__getitem__(index), Resume_phoneNo_vector.__getitem__(index),Resume_email_vector.__getitem__(index),
-                           Resume_exp_vector.__getitem__(index),round(final_rating),Resume_skill_list.__getitem__(index),
-                           Resume_non_skill_list.__getitem__(index),min_qual_vector.__getitem__(index),is_min_qual.__getitem__(index),Resume_ApplicantName_vector.__getitem__(index),Resume_JobTitleAvailability_vector.__getitem__(index),badWords.__getitem__(index))
-        flask_return.append(res)
-        #print(res.toJSON())
-    #flask_return.sort(key=lambda x: x.finalRank, reverse=True)
-    #flask_return = [word.replace('\n    ','') for word in flask_return]
     return flask_return
-

@@ -13,8 +13,6 @@ global skill_threshold
 skill_threshold = 5
 global non_tech_weightage
 non_tech_weightage = 5
-global exp_weightage
-exp_weightage = 0
 global skill_weightage
 skill_weightage = 35
 
@@ -139,7 +137,7 @@ class ExtractExp:
             
         return experience
 
-    def get_exp_weightage(self,jd_exp,resume_exp):
+    def get_exp_weightage(self,jd_exp,resume_exp,exp_weightage):
         
         score = 0
         resume_exp = int(round(resume_exp))

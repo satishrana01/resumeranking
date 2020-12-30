@@ -255,7 +255,6 @@ def scan():
                     flask_return = jsoncore.res(search_st,skill_text,jd_exp,min_qual, title,input_json,aws_path,must_have_skill, s3_resource, fs, bucket_name)
                     finalResult[title]=flask_return
                     final_json = json.dumps(finalResult,default=lambda o: o.__dict__)
-                    print("Output response ",final_json)
                     return Response(final_json,status=200,mimetype="application/json")
                 except Exception as e: 
                     print(e)
@@ -282,7 +281,6 @@ def scan():
                     flask_return = jsoncore.res(search_st,skill_text,jd_exp,min_qual, title,input_json,aws_path,must_have_skill, s3_resource, fs, bucket_name)
                     finalResult[title]=flask_return
                     final_json = json.dumps(finalResult,default=lambda o: o.__dict__)
-                    print("Output response ",final_json)
                     return Response(final_json,status=200,mimetype="application/json")
                 except Exception as e: print(e)    
         #print(finalResult)
