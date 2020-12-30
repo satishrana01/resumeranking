@@ -148,7 +148,7 @@ def skillSetListMatchedWithJD(resume, jdTxt,rank):
 #Function defined for keyword matching for JD and Resume
 def JDkeywordMatch(JDText, ResumeText, Weightage):
 
-    
+    match_dictionary = {}
     JD_Keyword_Matched = []
     Resume_Keyword_Matched = []
     ResumJD_Missed = [] # keywords available in JD but not available in Resume
@@ -170,7 +170,8 @@ def JDkeywordMatch(JDText, ResumeText, Weightage):
     for word in Resume_Keyword_Matched:
        if word in JD_Keyword_Matched:
            ResumeJD_Matched.append(word)
-
+    
+    ResumeJD_Matched = list(set(ResumeJD_Matched))
     finalResult = {}
     JD_freq = {} 
     Resume_freq = {}
@@ -188,6 +189,11 @@ def JDkeywordMatch(JDText, ResumeText, Weightage):
 
     JD_freq = collections.OrderedDict(sorted(JD_freq.items()))   
     Resume_freq = collections.OrderedDict(sorted(Resume_freq.items()))
+    
+    # Get match dictionary
+    match_dictionary = {key: value for key, value in Resume_freq.items() if key in ResumeJD_Matched}
+    #print("match dictionary is ", match_dictionary)
+    
     # Rank logic
     percent_EachJDKeywords = round(Weightage/len(JD_freq))
     main_JD_keys = list(set(JD_Keyword_Matched))
@@ -211,7 +217,7 @@ def JDkeywordMatch(JDText, ResumeText, Weightage):
        FinalPercentage = FinalPercentage + v
 
     finalResult['rank'] = FinalPercentage
-    finalResult['jdKeywordMatch'] = JD_freq
+    finalResult['jdKeywordMatch'] = match_dictionary
     finalResult['jdKeywordUnMatched'] = ResumJD_Missed
     
     return finalResult   

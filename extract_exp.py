@@ -80,7 +80,7 @@ class ExtractExp:
         #TODO need to calculate months also
         yearStrings = ['yrs', 'years', 'yr','year']
         totMatchString = ['professional', 'total', 'around', 'approx', 'approximately', 'approx.', 'approx:', 'approximately:', 'profesional', 'proffesional', 'work', 'technical', 'overall', 'over all']
-        experience = []
+        experience = 0.0
         experience_df=pd.DataFrame(columns=('Type', 'Years', 'Months', 'Location'))
         try:
             pos = 0
