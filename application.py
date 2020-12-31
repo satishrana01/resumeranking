@@ -22,6 +22,7 @@ from datetime import datetime
 warnings.filterwarnings(action='ignore', category=UserWarning, module='gensim')
 
 application = Flask(__name__)
+application.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 bcrypt = Bcrypt(application)
 
 nltk.download('punkt')
@@ -402,5 +403,5 @@ if __name__ == '__main__':
     #initialize()
     if not os.path.exists('db.sqlite'):
         db.create_all()
-    application.run()
+    application.run(debug=True)
  

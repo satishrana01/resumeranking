@@ -3,7 +3,6 @@ import os
 from textblob import TextBlob
 import collections
 import nltk
-nltk.download('punkt')
 
 global rootpath
 rootpath = os.getcwd()
