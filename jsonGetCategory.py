@@ -152,55 +152,35 @@ def JDkeywordMatch(JDText, ResumeText, Weightage):
     Resume_Keyword_Matched = []
     ResumJD_Missed = [] # keywords available in JD but not available in Resume
     ResumeJD_Matched = []
-    jd_tokenised = nltk.word_tokenize(JDText)
-    jd_WordList = [x.lower() for x in jd_tokenised]
-    resume_tokenised =  nltk.word_tokenize(ResumeText)
-    resume_WordList = [x.lower() for x in resume_tokenised]
+    rank_dict = {}
+    FinalPercentage = 0
+    jd_WordList = nltk.word_tokenize(JDText.lower()) 
+    resume_WordList = nltk.word_tokenize(ResumeText.lower()) 
 
-    for keys in jd_WordList:
-      if keys in keywords_list:
-            JD_Keyword_Matched.append(keys)
-    for keys in resume_WordList:
-        if keys in keywords_list: 
-            Resume_Keyword_Matched.append(keys)
-
+    JD_Keyword_Matched = [keys for keys in jd_WordList if keys in keywords_list] 
+    Resume_Keyword_Matched = [keys for keys in resume_WordList if keys in keywords_list]
     ResumJD_Missed = list(set(JD_Keyword_Matched)- set(Resume_Keyword_Matched))  
 
-    for word in Resume_Keyword_Matched:
-       if word in JD_Keyword_Matched:
-           ResumeJD_Matched.append(word)
-    
+    #ResumeJD_Matched = [keys for word in Resume_Keyword_Matched if word in JD_Keyword_Matched]
+    ResumeJD_Matched = list(set(Resume_Keyword_Matched).intersection(set(JD_Keyword_Matched)))
     ResumeJD_Matched = list(set(ResumeJD_Matched))
     finalResult = {}
     JD_freq = {} 
     Resume_freq = {}
-    for item in JD_Keyword_Matched: 
-        if (item in JD_freq): 
-            JD_freq[item] += 1
-        else: 
-            JD_freq[item] = 1
-
-    for item in Resume_Keyword_Matched: 
-        if (item in Resume_freq): 
-            Resume_freq[item] += 1
-        else: 
-            Resume_freq[item] = 1
-
+    JD_freq = dict(collections.Counter(JD_Keyword_Matched))
+    Resume_freq = dict(collections.Counter(Resume_Keyword_Matched))
     JD_freq = collections.OrderedDict(sorted(JD_freq.items()))   
     Resume_freq = collections.OrderedDict(sorted(Resume_freq.items()))
     
     # Get match dictionary
-    match_dictionary = {key: value for key, value in Resume_freq.items() if key in ResumeJD_Matched}
-    #print("match dictionary is ", match_dictionary)
-    
+    match_dictionary = {key: "{}/{}".format(JD_freq[key], value) for key, value in Resume_freq.items() if key in ResumeJD_Matched}
+    missed_dictionary = {key: value for key, value in JD_freq.items() if key in ResumJD_Missed}
     # Rank logic
     percent_EachJDKeywords = round(Weightage/len(JD_freq))
     main_JD_keys = list(set(JD_Keyword_Matched))
     perc_Dict = dict((k,percent_EachJDKeywords) for k in main_JD_keys)
 
     # Ranking
-    rank_dict = {}
-    FinalPercentage = 0
     for key in main_JD_keys:
         if key in  Resume_Keyword_Matched:
           if (Resume_freq.get(key) >= JD_freq.get(key)):
@@ -212,12 +192,10 @@ def JDkeywordMatch(JDText, ResumeText, Weightage):
         else:
             rank_dict[key] = 0
 
-    for k,v in rank_dict.items():
-       FinalPercentage = FinalPercentage + v
-
+    FinalPercentage = sum(rank_dict.values())
     finalResult['rank'] = FinalPercentage
     finalResult['jdKeywordMatch'] = match_dictionary
-    finalResult['jdKeywordUnMatched'] = ResumJD_Missed
+    finalResult['jdKeywordUnMatched'] = missed_dictionary
     
     return finalResult   
 

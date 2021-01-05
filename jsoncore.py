@@ -204,7 +204,7 @@ def threaded_process(resume_chunk,final_path,jobfile,skillset,min_qual,jd_exp,re
                            Resume_exp_vector,round(final_rating),Resume_skill_list,
                            Resume_non_skill_list,min_qual_score,is_min_qual,temp_applicantName,bool_jobTitleFound,badWords)
             flask_return.append(res)
-            #print("S.No {} Rank prepared for {}".format(count,j))
+            print("S.No {} Rank prepared for {}".format(count,j))
         except Exception:
             print(traceback.format_exc())
 
@@ -281,17 +281,6 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_hav
             proc.join()
         
         flask_return = list(flask_return)
-    """
-    for thr in range(n_threads):
-        thread = threading.Thread(target=threaded_process, args=(array_chunk[thr],final_path,jobfile,skillset,min_qual,jd_exp,resumePath,flask_return,must_have_skill,job_title,jd_weightage,skill_weightage,min_qual_weightage,non_tech_weightage,exp_weightage,))
-        thread_list.append(thread)
-    for thread in thread_list:
-        thread.start()  
-    
-    for thread in thread_list:
-        thread.join()
-"""        
-    
     try:
         shutil.rmtree(final_path, ignore_errors=True)
     except:

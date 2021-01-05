@@ -19,13 +19,13 @@ import os
 #import en_core_web_sm
 
 def isJobTitleAvailable(jobTitle, tttt):
-    if (tttt.find(jobTitle) != -1): 
+    if (tttt.lower().find(jobTitle.lower()) != -1): 
         result = "True"
         return result
     else: 
         result = "False"
         return result
-
+    
 #Function to extract names from the string using spacy
 def extract_name(resume):
    
