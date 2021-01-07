@@ -38,7 +38,6 @@ pathSeprator = '/'
 global bucket_name
 bucket_name = 'resume-rank-bucket'
 Ordered_list_jd = []
-jd_text_data = []
 Jd_total_exp_vector = []
 
 #application.config.from_object(__name__) # load config from this file , flaskr.py
@@ -281,6 +280,7 @@ def scan():
                 
             elif Temp[-1] == "txt":  
                 print(count," This is txt" , i)
+                jd_text_data = []
                 try:
                     temp_path = i.rsplit('/',1)
                     f = open(final_path+pathSeprator+temp_path[1],'r')
@@ -288,7 +288,6 @@ def scan():
                     a =  "\n".join(lines)
                     c = [str(a)]
                     jd_text_data.extend(c)
-                    Ordered_list_jd.append(i)
                     f.close()
                     search_st = jd_text_data[0]
                     skill_text = jd_text_data[0]
