@@ -17,7 +17,9 @@ import jwt
 from werkzeug.security import generate_password_hash, check_password_hash
 import boto3
 import s3fs
+from time import gmtime, strftime
 from datetime import datetime
+import shutil
 
 warnings.filterwarnings(action='ignore', category=UserWarning, module='gensim')
 
@@ -38,19 +40,6 @@ bucket_name = 'resume-rank-bucket'
 Ordered_list_jd = []
 jd_text_data = []
 Jd_total_exp_vector = []
-LIST_OF_FILES_TXT_JD = []
-LIST_OF_FILES_XLSX_JD = []
-LIST_OF_FILES_JD = []
-
-#os.environ['AWS_PROFILE'] = "resumerank"
-#os.environ['AWS_DEFAULT_REGION'] = "ap-south-1"
-#s3 = boto3.client('s3')
-
-#s3 = boto3.client('s3', region_name='ap-south-1')
-#response = s3.list_buckets()
-#print('Regions: >>>>', response)
-s3_resource = boto3.resource("s3")
-fs = s3fs.S3FileSystem(anon=False)
 
 #application.config.from_object(__name__) # load config from this file , flaskr.py
 
@@ -164,6 +153,7 @@ def home():
     checkSession() 
     return render_template('index.html')
 
+"""
 @application.route('/results', methods=['GET', 'POST'])
 def res():
     if request.method == 'POST':
@@ -186,6 +176,7 @@ def res():
             result.append(obj)
             
         return render_template('result.html', results = result)
+        """
 
 """ this method will return json response of scan """
 
@@ -223,8 +214,15 @@ def res():
 @auth.login_required
 def scan():
     extract_exp = ExtractExp()
+    s3 = boto3.resource('s3')
+    root_path='temp/'
     if request.method == 'POST':
         #os.chdir(app.config['UPLOAD_JD_FOLDER'])
+        LIST_OF_FILES_TXT_JD = []
+        LIST_OF_FILES_XLSX_JD = []
+        LIST_OF_FILES_JD = []
+        s3_resource = boto3.resource("s3")
+        fs = s3fs.S3FileSystem(anon=False)
         now = datetime.now()
         input_json = request.get_json()
         print("input request",input_json)
@@ -233,21 +231,34 @@ def scan():
         must_have_skill = input_json["mustHave"]
         
         for file in fs.glob(jd_file_path+'/*.xlsx'):
-            LIST_OF_FILES_TXT_JD.append(file)
-        for file in fs.glob(jd_file_path+'/*.txt'):
             LIST_OF_FILES_XLSX_JD.append(file)
+        for file in fs.glob(jd_file_path+'/*.xls'):
+            LIST_OF_FILES_XLSX_JD.append(file)    
+        for file in fs.glob(jd_file_path+'/*.txt'):
+            LIST_OF_FILES_TXT_JD.append(file)
             
         LIST_OF_FILES_JD = LIST_OF_FILES_TXT_JD + LIST_OF_FILES_XLSX_JD
+        sub_dir = aws_path.split(pathSeprator)[0]
+        final_path = root_path+sub_dir+strftime("%H%M%S", gmtime())
+        if not os.path.exists(final_path):
+            os.makedirs(final_path)
+            print("directory created",final_path)
+            
+        for count,i in enumerate(LIST_OF_FILES_JD):
+            i = i.replace(bucket_name+pathSeprator, "")
+            head, fileName = os.path.split(i)
+            path_to_read_file = final_path+pathSeprator+fileName
+            s3.Bucket(bucket_name).download_file(i,path_to_read_file)
+        
         finalResult = {}
         finalResult["userInfo"] = { "companyName":input_json["userInfo"]["companyName"], "name":input_json["userInfo"]["name"], "accountType":input_json["userInfo"]["accountType"], "dateOfScan":now.strftime("%d/%m/%Y %H:%M:%S")}
         for count,i in enumerate(LIST_OF_FILES_JD):
             Temp = i.rsplit('.',1)
-            
-            if Temp[-1] == "xlsx" or Temp[-1] == "Xlsx" or Temp[-1] == "XLSX":
+            if Temp[-1] == "xlsx" or Temp[-1] == "xls":
                 try:
-                    print('JD location ', 's3://{}.xlsx'.format(jd_file_path, i))
-                    data_set = pd.read_excel("s3://{}".format(i))
-                    Ordered_list_jd.append(i)
+                    print('JD file name {}'.format(i))
+                    temp_path = i.rsplit('/',1)
+                    data_set = pd.read_excel(final_path+pathSeprator+temp_path[1])
                     search_st = data_set['High Level Job Description'][0].lower()
                     skill_text = data_set['Technology'][0] + data_set['Primary Skill'][0].lower()
                     jd_exp = data_set['Yrs Of Exp '][0]
@@ -256,6 +267,11 @@ def scan():
                     flask_return = jsoncore.res(search_st,skill_text,jd_exp,min_qual, title,input_json,aws_path,must_have_skill, s3_resource, fs, bucket_name)
                     finalResult[title]=flask_return
                     final_json = json.dumps(finalResult,default=lambda o: o.__dict__)
+                    try:
+                        shutil.rmtree(final_path, ignore_errors=True)
+                    except:
+                        print("unable to delete directory ",final_path)
+                            
                     return Response(final_json,status=200,mimetype="application/json")
                 except Exception as e: 
                     print(e)
@@ -263,10 +279,11 @@ def scan():
        
             
                 
-            elif Temp[-1] == "txt" or Temp[-1] == "Txt" or Temp[-1] == "TXT":  
+            elif Temp[-1] == "txt":  
                 print(count," This is txt" , i)
                 try:
-                    f = fs.open(i,'r')
+                    temp_path = i.rsplit('/',1)
+                    f = open(final_path+pathSeprator+temp_path[1],'r')
                     lines = f.readlines()
                     a =  "\n".join(lines)
                     c = [str(a)]
@@ -282,6 +299,11 @@ def scan():
                     flask_return = jsoncore.res(search_st,skill_text,jd_exp,min_qual, title,input_json,aws_path,must_have_skill, s3_resource, fs, bucket_name)
                     finalResult[title]=flask_return
                     final_json = json.dumps(finalResult,default=lambda o: o.__dict__)
+                    try:
+                        shutil.rmtree(final_path, ignore_errors=True)
+                    except:
+                        print("unable to delete directory ",final_path)
+
                     return Response(final_json,status=200,mimetype="application/json")
                 except Exception as e: print(e)    
         #print(finalResult)

@@ -204,7 +204,7 @@ def threaded_process(resume_chunk,final_path,jobfile,skillset,min_qual,jd_exp,re
                            Resume_exp_vector,round(final_rating),Resume_skill_list,
                            Resume_non_skill_list,min_qual_score,is_min_qual,temp_applicantName,bool_jobTitleFound,badWords)
             flask_return.append(res)
-            print("S.No {} Rank prepared for {}".format(count,j))
+            
         except Exception:
             print(traceback.format_exc())
 

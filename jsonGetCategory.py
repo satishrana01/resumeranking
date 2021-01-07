@@ -63,7 +63,7 @@ def word_polarity(resume_text):
             neg_word_list.append(word)
         
      
-    return neg_word_list    
+    return list(set(neg_word_list))    
 
 def minQualificationScore(resume, jdTxt,min_qual_weightage):
     programmingTotal = 0
