@@ -49,8 +49,9 @@ def extract_phone_numbers(string):
 
 #Function to extract Email address from a string using regular expressions
 def extract_email_addresses(string):
+    string1 = string.replace(" @gmail", "@gmail") 
     r = re.compile(r'[\w\.-]+@[\w\.-]+')
-    return r.findall(string)
+    return r.findall(string1.lower())
 
 def extractPersonName(tttt, resumeTitle):
         #a = 'Cv_saurabh+keshari_1234_Resume'
