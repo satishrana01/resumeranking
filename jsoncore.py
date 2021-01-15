@@ -264,7 +264,7 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_hav
 
     flask_return = []
         
-    n_threads = 10
+    n_threads = 5
     array_chunk = np.array_split(LIST_OF_FILES, n_threads)
     thread_list = []
     procs = []
