@@ -177,8 +177,9 @@ def threaded_process(resume_chunk,final_path,jobfile,skillset,min_qual,jd_exp,re
             
             experience = extract_exp.get_features(temptext)
             
-            temp_applicantName = entity.extractPersonName(temptext, str(j))
-                        
+            #temp_applicantName = entity.extractPersonName(temptext, str(j))
+            temp_applicantName = entity.extractPersonName(temptext)
+            
             bool_jobTitleFound = entity.isJobTitleAvailable(job_title, temptext)
                        
             temp_phone = entity.extract_phone_numbers(temptext)
