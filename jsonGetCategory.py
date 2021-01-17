@@ -113,7 +113,6 @@ def skillSetListMatchedWithJD(resume, jdTxt,rank):
     skillMatched = []
     skillNotMatched = []
     finalResult ={}
-
     for i in range(len(programming_skill)):
         if programming_skill[i] in jdTxt.lower() != -1:
             jdSkillMatched.append(programming_skill[i])

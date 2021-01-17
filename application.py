@@ -290,12 +290,11 @@ def scan():
                     jd_text_data.extend(c)
                     f.close()
                     search_st = jd_text_data[0]
-                    skill_text = jd_text_data[0]
                     experience = extract_exp.get_features(search_st)
                     jd_exp = experience
                     title = jd_text_data[0][0:20] # Getting substring with initial 20 chars
                     min_qual = ""
-                    flask_return = jsoncore.res(search_st,skill_text,jd_exp,min_qual, title,input_json,aws_path,must_have_skill, s3_resource, fs, bucket_name)
+                    flask_return = jsoncore.res(search_st,"",jd_exp,min_qual, title,input_json,aws_path,must_have_skill, s3_resource, fs, bucket_name)
                     finalResult[title]=flask_return
                     final_json = json.dumps(finalResult,default=lambda o: o.__dict__)
                     try:
