@@ -15,7 +15,7 @@ cloudpickle==1.6.0
 colorama==0.3.9
 compressed-rtf==1.0.6
 contractions==0.0.45
-cryptography==3.3.1
+cryptography==3.3.2
 Cython==0.29.14
 dask==2020.12.0
 distributed==2020.12.0
