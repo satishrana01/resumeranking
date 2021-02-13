@@ -186,7 +186,7 @@ def threaded_process(resume_chunk,final_path,jobfile,skillset,min_qual,jd_exp,re
             if(len(temp_phone) == 0):
                 Resume_phoneNo_vector = not_found
             else:
-                 Resume_phoneNo_vector = temp_phone
+                 Resume_phoneNo_vector = list(set(temp_phone))
             temp_email = entity.extract_email_addresses(temptext)
             if(len(temp_email) == 0):
                 Resume_email_vector = not_found

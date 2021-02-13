@@ -8,9 +8,6 @@ Created on Sat Dec 29 20:57:57 2018
 #mport spacy
 import re
 import nltk
-nltk.download('stopwords')
-nltk.download('wordnet')
-nltk.download('punkt')
 from nltk.corpus import wordnet, stopwords
 from text_process import remove_stopwords, to_lowercase
 import os
@@ -63,7 +60,6 @@ def extract_email_addresses(string):
 
 def extractPersonName(resumeText):
     resumeText = resumeText.lower()
-    print('resume text is ', resumeText)
     pattern = re.compile("\\b(resume|cv|curriculum vitae)\\W", re.I)
     resumeText =  pattern.sub("", resumeText)
     String = resumeText[:30]
@@ -101,25 +97,3 @@ def extractPersonName(resumeText):
     NameList = Nouns_List[:2]
     Name = " ".join(NameList)
     return Name
-     
-    
-
-"""
-
-resume = open("resumeSample.txt", "r")
-resume_txt = resume.read()
-#print(resume_txt)
-#print(programmingScore(pdftotextmaybe.convert("Sample resumes/sample1.pdf"), jd_txt) )
-#print(extract_name(resume_txt) )
-print("Phone numbers are ",extract_phone_numbers(resume_txt) )
-print("Email id is ",extract_email_addresses(resume_txt) )
-
-
- Code to Read skills from any file 
-skills = open("skillDB.txt", "r")
-skills = skills.read()
-print(skills)
-listOfSkills = skills.split(",")
-print(listOfSkills)
-
-"""

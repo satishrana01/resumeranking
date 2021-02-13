@@ -31,6 +31,8 @@ nltk.download('punkt')
 nltk.download('averaged_perceptron_tagger')
 nltk.download('maxent_ne_chunker')
 nltk.download('words')
+nltk.download('stopwords')
+nltk.download('wordnet')
 global rootpath
 rootpath = os.getcwd()
 global pathSeprator
@@ -228,6 +230,29 @@ def scan():
         aws_path = input_json["userInfo"]["name"]+pathSeprator+input_json["jobDetails"]["scan"]
         jd_file_path = bucket_name+pathSeprator+aws_path+pathSeprator+application.config['UPLOAD_JD_FOLDER']
         must_have_skill = input_json["mustHave"]
+        input_job_present = False
+        finalResult = {}
+        finalResult["userInfo"] = { "companyName":input_json["userInfo"]["companyName"], "name":input_json["userInfo"]["name"], "accountType":input_json["userInfo"]["accountType"], "dateOfScan":now.strftime("%d/%m/%Y %H:%M:%S")}
+        
+        try:
+            jobDescription = input_json["jobDetails"]["highLevelJobDescription"]
+            if jobDescription:
+                input_job_present = True
+        except:
+            print("no input jd")
+            
+        if(input_job_present):
+            search_st = input_json["jobDetails"]["highLevelJobDescription"].lower()
+            skill_text = input_json["jobDetails"]["technology"].lower() + input_json["jobDetails"]["primarySkill"].lower()
+            jd_exp = input_json["jobDetails"]["yrsOfExp"]
+            title = input_json["jobDetails"]["jobTitle"].lower()
+            min_qual = input_json["jobDetails"]["minimumQualification"].lower()
+            flask_return = jsoncore.res(search_st,skill_text,jd_exp,min_qual, title,input_json,aws_path,must_have_skill, s3_resource, fs, bucket_name)
+            finalResult[title]=flask_return
+            final_json = json.dumps(finalResult,default=lambda o: o.__dict__)
+            return Response(final_json,status=200,mimetype="application/json")
+            
+            
         
         for file in fs.glob(jd_file_path+'/*.xlsx'):
             LIST_OF_FILES_XLSX_JD.append(file)
@@ -249,8 +274,6 @@ def scan():
             path_to_read_file = final_path+pathSeprator+fileName
             s3.Bucket(bucket_name).download_file(i,path_to_read_file)
         
-        finalResult = {}
-        finalResult["userInfo"] = { "companyName":input_json["userInfo"]["companyName"], "name":input_json["userInfo"]["name"], "accountType":input_json["userInfo"]["accountType"], "dateOfScan":now.strftime("%d/%m/%Y %H:%M:%S")}
         for count,i in enumerate(LIST_OF_FILES_JD):
             Temp = i.rsplit('.',1)
             if Temp[-1] == "xlsx" or Temp[-1] == "xls":
