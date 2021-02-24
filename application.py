@@ -202,14 +202,14 @@ def scan():
         finalResult["userInfo"] = { "companyName":input_json["userInfo"]["companyName"], "name":input_json["userInfo"]["name"], "accountType":input_json["userInfo"]["accountType"], "dateOfScan":now.strftime("%d/%m/%Y %H:%M:%S")}
         
         try:
-            jobDescription = input_json["jobDetails"]["JobDescription"]
+            jobDescription = input_json["jobDetails"]["jobDescription"]
             if jobDescription:
                 input_job_present = True
         except:
             print("no input jd")
             
         if(input_job_present):
-            search_st = input_json["jobDetails"]["JobDescription"].lower()
+            search_st = input_json["jobDetails"]["jobDescription"].lower()
             skill_text = input_json["jobDetails"]["primarySkill"].lower()
             soft_skill = input_json["jobDetails"]["softSkill"].lower()
             jd_exp = 0 #input_json["jobDetails"]["yrsOfExp"]
