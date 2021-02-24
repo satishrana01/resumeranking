@@ -2,12 +2,15 @@
 """
 Created on Sat Dec 29 20:57:57 2018
 
-@author: saurabh.keshari
+
 """
 #python -m spacy download en_core_web_sm
 #mport spacy
 import re
 import nltk
+nltk.download('stopwords')
+nltk.download('wordnet')
+nltk.download('punkt')
 from nltk.corpus import wordnet, stopwords
 from text_process import remove_stopwords, to_lowercase
 import os

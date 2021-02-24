@@ -4,7 +4,6 @@ import time
 import warnings
 from flask import (Flask,session,flash, redirect, render_template, request,
                    url_for, send_from_directory,jsonify,g, abort,Response)
-import core
 from flask_bcrypt import Bcrypt
 import pandas as pd
 import nltk
@@ -178,39 +177,7 @@ def res():
             
         return render_template('result.html', results = result)
         """
-
-""" this method will return json response of scan """
-
-""" input json 
-
-{
-   "userInfo":{
-      "companyName":"abc",
-      "name":"username"
-   },
-   "jobDetails":{
-      "scan":"scan1"
-   },
-   "weightage":{
-      "jd":15,
-      "skill":35,
-      "soft_skill":5,
-      "experience":{
-         "required":false,
-         "allocation":30
-      },
-      "minimum_qualification":15
-   },
-   "mustHave":[
-      "Must Have 1",
-      "Must Have 2",
-      "Must Have 3",
-      "Must Have 4",
-      "Must Have 5"
-   ]
-} """
-
-		
+	
 @application.route('/api/rank/scan', methods=['POST'])
 @auth.login_required
 def scan():
@@ -235,19 +202,20 @@ def scan():
         finalResult["userInfo"] = { "companyName":input_json["userInfo"]["companyName"], "name":input_json["userInfo"]["name"], "accountType":input_json["userInfo"]["accountType"], "dateOfScan":now.strftime("%d/%m/%Y %H:%M:%S")}
         
         try:
-            jobDescription = input_json["jobDetails"]["highLevelJobDescription"]
+            jobDescription = input_json["jobDetails"]["JobDescription"]
             if jobDescription:
                 input_job_present = True
         except:
             print("no input jd")
             
         if(input_job_present):
-            search_st = input_json["jobDetails"]["highLevelJobDescription"].lower()
-            skill_text = input_json["jobDetails"]["technology"].lower() + input_json["jobDetails"]["primarySkill"].lower()
-            jd_exp = input_json["jobDetails"]["yrsOfExp"]
+            search_st = input_json["jobDetails"]["JobDescription"].lower()
+            skill_text = input_json["jobDetails"]["primarySkill"].lower()
+            soft_skill = input_json["jobDetails"]["softSkill"].lower()
+            jd_exp = 0 #input_json["jobDetails"]["yrsOfExp"]
             title = input_json["jobDetails"]["jobTitle"].lower()
-            min_qual = input_json["jobDetails"]["minimumQualification"].lower()
-            flask_return = jsoncore.res(search_st,skill_text,jd_exp,min_qual, title,input_json,aws_path,must_have_skill, s3_resource, fs, bucket_name)
+            min_qual = "NOSKILL" #input_json["jobDetails"]["minimumQualification"].lower()
+            flask_return = jsoncore.res(search_st,skill_text,jd_exp,min_qual, title,input_json,aws_path,must_have_skill, s3_resource, fs, bucket_name,soft_skill,skill_text)
             finalResult[title]=flask_return
             final_json = json.dumps(finalResult,default=lambda o: o.__dict__)
             return Response(final_json,status=200,mimetype="application/json")

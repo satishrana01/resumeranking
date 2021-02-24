@@ -67,7 +67,7 @@ def _s3_download(s3,bucket_name,path_to_read_file,i):
         print(e)
 
 def threaded_process(resume_chunk,final_path,jobfile,skillset,min_qual,jd_exp,resumePath,flask_return,must_have_skill,job_title,
-                     jd_weightage,skill_weightage,min_qual_weightage,non_tech_weightage,exp_weightage):
+                     jd_weightage,skill_weightage,min_qual_weightage,non_tech_weightage,exp_weightage,soft_skill="",programming_skill=""):
 
     not_found = 'Not Found'
     extract_exp = ExtractExp()
@@ -171,8 +171,8 @@ def threaded_process(resume_chunk,final_path,jobfile,skillset,min_qual,jd_exp,re
             is_min_qual = confidence
             
             
-            skill_rank = skills.programmingScore(temptext,jobfile+skillset,skill_weightage)
-            Resume_skill_list = skills.skillSetListMatchedWithJD(temptext,jobfile+skillset,skill_rank)
+            skill_rank = skills.programmingScore(temptext,jobfile+skillset,skill_weightage,programming_skill)
+            Resume_skill_list = skills.skillSetListMatchedWithJD(temptext,jobfile+skillset,skill_rank,programming_skill)
             
             
             experience = extract_exp.get_features(temptext)
@@ -191,13 +191,13 @@ def threaded_process(resume_chunk,final_path,jobfile,skillset,min_qual,jd_exp,re
             if(len(temp_email) == 0):
                 Resume_email_vector = not_found
             else:
-                 Resume_email_vector = temp_email
+                 Resume_email_vector =  list(set(temp_email))
                 
            
             Resume_exp_vector = extract_exp.get_exp_weightage(str(jd_exp),experience,exp_weightage)
             
             non_tech_Score = skills.NonTechnicalSkillScore(temptext,jobfile+skillset,non_tech_weightage)
-            Resume_non_skill_list = skills.nonTechSkillSetListMatchedWithJD(temptext,jobfile+skillset,non_tech_Score)
+            Resume_non_skill_list = skills.nonTechSkillSetListMatchedWithJD(temptext,jobfile+skillset,non_tech_Score,soft_skill)
             
             final_rating = jd_rankDict.get('rank')+skill_rank+non_tech_Score+extract_exp.get_exp_weightage(str(jd_exp),experience,exp_weightage)+min_qual_score
            
@@ -210,7 +210,7 @@ def threaded_process(resume_chunk,final_path,jobfile,skillset,min_qual,jd_exp,re
             print(traceback.format_exc())
 
 
-def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_have_skill, s3_resource, fs, bucket_name):
+def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_have_skill, s3_resource, fs, bucket_name,soft_skill="",programming_skill=""):
 
     LIST_OF_FILES = []
     LIST_OF_FILES_PDF = []
@@ -267,14 +267,13 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_hav
         
     n_threads = 5
     array_chunk = np.array_split(LIST_OF_FILES, n_threads)
-    thread_list = []
     procs = []
     print("Resume processing started...")
     with Manager() as manager:
         flask_return = manager.list()
         for thr in range(n_threads):
            # print(name)
-           proc = Process(target=threaded_process, args=(array_chunk[thr],final_path,jobfile,skillset,min_qual,jd_exp,resumePath,flask_return,must_have_skill,job_title,jd_weightage,skill_weightage,min_qual_weightage,non_tech_weightage,exp_weightage,))
+           proc = Process(target=threaded_process, args=(array_chunk[thr],final_path,jobfile,skillset,min_qual,jd_exp,resumePath,flask_return,must_have_skill,job_title,jd_weightage,skill_weightage,min_qual_weightage,non_tech_weightage,exp_weightage,soft_skill,programming_skill))
            procs.append(proc)
            proc.start()
            
