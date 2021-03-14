@@ -18,35 +18,43 @@ keywords_list = ['consulting services','analyzing data','public policy','cross-f
 global soft_skills
 soft_skills = ['team player','self-directed learning','collaboration','communication','resilience','big-picture mindset','prioritization ','creativity ','creative','insight','curiosity','curious','openness','teamwork','time management','emotional intelligence','quick learner','problem solver','customer-service skills','planning and organizing','innovative','thinking innovatively and creatively','resourceful','flexible','able to manage own time','having self-esteem','innovation skills','enterprise skills','civic or citizenship knowledge and skills','sociability','self-management','integrity','honesty','human resources','participates as a team member','works with diversity','exercises leadership','leadership','exercises leadership','monitors and corrects performance','understands systems','customer service','interpersonal skills','addressed','advertised','arbitrated','arranged','articulated','authored','clarified','collaborated','communicated','composed','condensed','conferred','consulted','contacted','conveyed','convinced','corresponded','debated','defined','developed','directed','discussed','drafted','edited','elicited','enlisted','explained','expressed','formulated','furnished','incorporated','influenced','interacted','interpreted','interviewed','involved','joined','judged','lectured','listened','marketed','mediated','moderated','negotiated','observed','outlined','participated','persuaded','presented','promoted','proposed','publicized','reconciled','recruited','referred','reinforced','reported','resolved','responded','solicited','specified','spoke','suggested','summarized','synthesized','translated','wrote','administered','analyzed','appointed','approved','assigned','attained','authorized','chaired','considered','consolidated','contracted','controlled','converted','coordinated','decided','delegated','developed','directed','eliminated','emphasized','enforced','enhanced','established','executed','generated','handled','headed','hired','hosted','improved','incorporated','increased','initiated','inspected','instituted','led','managed','merged','motivated','navigated','organized','originated','overhauled','oversaw','planned','presided','prioritized','produced','recommended','reorganized','replaced','restored','reviewed','scheduled','secured','selected','streamlined','strengthened','supervised','terminated','acted','adapted','began','combined','composed','conceptualized','condensed','created','customized','designed','developed','directed','displayed','drew','entertained','established','fashioned','formulated','founded','illustrated','initiated','instituted','integrated','introduced','invented','modeled','modified','originated','performed','photographed','planned','revised','revitalized','shaped','solved','administered','adjusted','allocated','analyzed','appraised','assessed','audited','balanced','budgeted','calculated','computed','conserved','corrected','determined','developed','estimated','forecasted','managed','marketed','measured','netted','planned','prepared','programmed','projected','qualified','reconciled','reduced','researched','retrieved','adapted','advocated','aided','answered','arranged','assessed','assisted','clarified','coached','collaborated','contributed','cooperated','counseled','demonstrated','diagnosed','educated','encouraged','ensured','expedited','facilitated','familiarized','furthered','guided','helped','insured','intervened','motivated','prevented','provided','referred','rehabilitated','represented','resolved','simplified','supplied','supported','volunteered','approved','arranged','catalogued','categorized','charted','classified','coded','collected','compiled','corrected','corresponded','distributed','executed','filed','generated','incorporated','inspected','logged','maintained','monitored','obtained','operated','ordered','organized','prepared','processed','provided','purchased','recorded','registered','reserved','responded','reviewed','routed','scheduled','screened','submitted','supplied','standardized','systematized','updated','validated','verified','analyzed','clarified','collected','compared','conducted','critiqued','detected','determined','diagnosed','evaluated','examined','experimented','explored','extracted','formulated','gathered','inspected','interviewed','invented','investigated','located','measured','organized','researched','reviewed','searched','solved','summarized','surveyed','systematized','tested','adapted','advised','clarified','coached','communicated','conducted','coordinated','critiqued','developed','enabled','encouraged','evaluated','explained','facilitated','focused','guided','individualized','informed','instilled','instructed','motivated','persuaded','simulated','stimulated','taught','tested','trained','transmitted','tutored','adapted','applied','assembled','built','calculated','computed','conserved','constructed','converted','debugged','designed','determined','developed','engineered','fabricated','fortified','installed','maintained','operated','overhauled','printed','programmed','rectified','regulated','remodeled','repaired','replaced','restored','solved','specialized','standardized','studied','upgraded','utilized']
 
-
-def programmingScore(resume, jdTxt,skill_weightage,programming_skill_from_input=""):
-    
-    
-    programmingTotal = 0
+def skillSetListMatchedWithJD(resume, jdTxt,skill_weightage,programming_skill_from_input=""):
+   
     jdSkillMatched = []
-    
+    skillMatched = []
+    skillNotMatched = []
+    finalResult ={}
     global programming_skill
     if bool(programming_skill_from_input and programming_skill_from_input.strip()):
         programming_skill = programming_skill_from_input.split(",")
-    
+        
     for i in range(len(programming_skill)):
         if programming_skill[i] in jdTxt.lower() != -1:
-            jdSkillMatched.append(programming_skill[i])
+            jdSkillMatched.append(programming_skill[i].lower())
+    
     jdSkillMatched = list(set(jdSkillMatched))
     individualSkillWeightage = 0
     
     if( len(jdSkillMatched) > 0):
         individualSkillWeightage = skill_weightage/len(jdSkillMatched)
     
-    ResumeProgrammingSkillsMatchedWithJD = []
+    resume_corpus = list(set(resume.split()))
+    
     for i in range(len(jdSkillMatched)):
-        if jdSkillMatched[i].lower() in resume.lower() != -1:
-            programmingTotal += 1
-            ResumeProgrammingSkillsMatchedWithJD.append(jdSkillMatched[i].lower())
+        skillFound = False
+        for j in range(len(resume_corpus)):
+            if jdSkillMatched[i] == resume_corpus[j]:
+                skillMatched.append(jdSkillMatched[i])
+                skillFound = True
+        if not skillFound:
+            skillNotMatched.append(jdSkillMatched[i])
+            
+    skillMatched = list(set(skillMatched))
+    skillNotMatched = list(set(skillNotMatched))
     
     list1 = []
     
-    for item in ResumeProgrammingSkillsMatchedWithJD:
+    for item in skillMatched:
         list1.append(remove_punctuations(item))
     
     results = {}
@@ -54,9 +62,12 @@ def programmingScore(resume, jdTxt,skill_weightage,programming_skill_from_input=
         results[i] = 1
     
     results.update({n: individualSkillWeightage * results[n] for n in results.keys()})
-    TotalScore = sum(results.values())
-    
-    return TotalScore
+    totalScore = sum(results.values())
+    finalResult['rank'] = round(totalScore)    
+    finalResult['skillMatch'] = skillMatched
+    finalResult['skillUnMatch'] = skillNotMatched
+ 
+    return finalResult
 
 def word_polarity(resume_text):
     
@@ -112,45 +123,6 @@ def minQualificationScore(resume, jdTxt,min_qual_weightage):
     
     return TotalScore
 
-def skillSetListMatchedWithJD(resume, jdTxt,rank,programming_skill_from_input=""):
-   
-    jdSkillMatched = []
-    skillMatched = []
-    skillNotMatched = []
-    finalResult ={}
-    global programming_skill
-    if bool(programming_skill_from_input and programming_skill_from_input.strip()):
-        programming_skill = programming_skill_from_input.split(",")
-        
-    for i in range(len(programming_skill)):
-        if programming_skill[i] in jdTxt.lower() != -1:
-            jdSkillMatched.append(programming_skill[i])
-        
-    
-    jdSkillMatched = list(set(jdSkillMatched))
-    
-    for i in range(len(jdSkillMatched)):
-        if jdSkillMatched[i].lower() in resume.lower() != -1:
-            skillMatched.append(jdSkillMatched[i].lower())
-        else:
-            skillNotMatched.append(jdSkillMatched[i].lower())
-
-    skillMatched = list(set(skillMatched))
-    skillNotMatched = list(set(skillNotMatched))
-    """ 
-    list1 = []
-    #list2 = []
-    for item in skillMatched:
-        list1.append(remove_punctuations(item))
-       
-    for item in skillNotMatched:
-        list2.append(remove_punctuations(item))    
-    """    
-    finalResult['rank'] = round(rank)    
-    finalResult['skillMatch'] = skillMatched
-    finalResult['skillUnMatch'] = skillNotMatched
- 
-    return finalResult
 
 #Function defined for keyword matching for JD and Resume
 def JDkeywordMatch(JDText, ResumeText, Weightage):

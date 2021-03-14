@@ -171,17 +171,10 @@ def threaded_process(resume_chunk,final_path,jobfile,skillset,min_qual,jd_exp,re
             is_min_qual = confidence
             
             
-            skill_rank = skills.programmingScore(temptext,jobfile+skillset,skill_weightage,programming_skill)
-            Resume_skill_list = skills.skillSetListMatchedWithJD(temptext,jobfile+skillset,skill_rank,programming_skill)
-            
-            
+            resume_skill_list = skills.skillSetListMatchedWithJD(temptext.lower(),jobfile+skillset,skill_weightage,programming_skill)
             experience = extract_exp.get_features(temptext)
-            
-            #temp_applicantName = entity.extractPersonName(temptext, str(j))
             temp_applicantName = entity.extractPersonName(temptext)
-            
             bool_jobTitleFound = entity.isJobTitleAvailable(job_title, temptext)
-                       
             temp_phone = entity.extract_phone_numbers(temptext)
             if(len(temp_phone) == 0):
                 Resume_phoneNo_vector = not_found
@@ -199,10 +192,10 @@ def threaded_process(resume_chunk,final_path,jobfile,skillset,min_qual,jd_exp,re
             non_tech_Score = skills.NonTechnicalSkillScore(temptext,jobfile+skillset,non_tech_weightage)
             Resume_non_skill_list = skills.nonTechSkillSetListMatchedWithJD(temptext,jobfile+skillset,non_tech_Score,soft_skill)
             
-            final_rating = jd_rankDict.get('rank')+skill_rank+non_tech_Score+extract_exp.get_exp_weightage(str(jd_exp),experience,exp_weightage)+min_qual_score
+            final_rating = jd_rankDict.get('rank')+resume_skill_list.get('rank')+non_tech_Score+extract_exp.get_exp_weightage(str(jd_exp),experience,exp_weightage)+min_qual_score
            
             res = ResultElement(jd_rankDict,j,experience,Resume_phoneNo_vector,Resume_email_vector,
-                           Resume_exp_vector,round(final_rating),Resume_skill_list,
+                           Resume_exp_vector,round(final_rating),resume_skill_list,
                            Resume_non_skill_list,min_qual_score,is_min_qual,temp_applicantName,bool_jobTitleFound,badWords)
             flask_return.append(res)
             
