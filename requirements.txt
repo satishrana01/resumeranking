@@ -36,7 +36,7 @@ IMAPClient==2.1.0
 importlib-metadata==3.3.0
 inflect==5.0.2
 itsdangerous==1.1.0
-Jinja2==2.11.2
+Jinja2==2.11.3
 jmespath==0.10.0
 joblib==1.0.0
 locket==0.2.0
