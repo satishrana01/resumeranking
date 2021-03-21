@@ -259,6 +259,12 @@ def res(jobfile,skillset,jd_exp,min_qual, job_title,input_json,aws_path,must_hav
     flask_return = []
         
     n_threads = 5
+    inputFileSize = len(LIST_OF_FILES)
+    if inputFileSize == 1 or inputFileSize == 2:
+        n_threads=1
+    elif inputFileSize == 3 or inputFileSize == 4 or inputFileSize == 5:
+        n_threads=2
+    
     array_chunk = np.array_split(LIST_OF_FILES, n_threads)
     procs = []
     print("Resume processing started...")

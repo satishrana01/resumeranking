@@ -28,9 +28,12 @@ def skillSetListMatchedWithJD(resume, jdTxt,skill_weightage,programming_skill_fr
     if bool(programming_skill_from_input and programming_skill_from_input.strip()):
         programming_skill = programming_skill_from_input.split(",")
         
+    jd_corpus = list(set(jdTxt.lower().split()))
+    
     for i in range(len(programming_skill)):
-        if programming_skill[i] in jdTxt.lower() != -1:
-            jdSkillMatched.append(programming_skill[i].lower())
+        for j in range(len(jd_corpus)):
+            if programming_skill[i] == jdTxt.lower():
+                jdSkillMatched.append(programming_skill[i].lower())
     
     jdSkillMatched = list(set(jdSkillMatched))
     individualSkillWeightage = 0
