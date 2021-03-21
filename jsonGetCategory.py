@@ -32,7 +32,7 @@ def skillSetListMatchedWithJD(resume, jdTxt,skill_weightage,programming_skill_fr
     
     for i in range(len(programming_skill)):
         for j in range(len(jd_corpus)):
-            if programming_skill[i] == jdTxt.lower():
+            if programming_skill[i] == jd_corpus[j]:
                 jdSkillMatched.append(programming_skill[i].lower())
     
     jdSkillMatched = list(set(jdSkillMatched))
