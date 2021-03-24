@@ -206,10 +206,13 @@ def scan():
             if jobDescription:
                 input_job_present = True
         except:
-            print("no input jd")
+            print("no input jd trying with new key")
+            jobDescription = input_json["jobDetails"]["JobDescription"]
+            if jobDescription:
+                input_job_present = True
             
         if(input_job_present):
-            search_st = input_json["jobDetails"]["jobDescription"].lower()
+            search_st = jobDescription.lower()
             skill_text = input_json["jobDetails"]["primarySkill"].lower()
             soft_skill = input_json["jobDetails"]["softSkill"].lower()
             jd_exp = 0 #input_json["jobDetails"]["yrsOfExp"]
